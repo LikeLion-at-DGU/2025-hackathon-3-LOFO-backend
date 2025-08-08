@@ -205,3 +205,17 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Django: 사용자 업로드 미디어 파일
+media/
+!media/.gitkeep
+
+# Django: 정적 파일 수집 결과
+staticfiles/
+
+# Django: 로컬 SQLite DB
+db.sqlite3
+db.sqlite3-journal
+
+# Django: 환경변수 파일
+.env
