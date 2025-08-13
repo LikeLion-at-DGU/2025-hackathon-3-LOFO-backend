@@ -15,7 +15,7 @@ class Profile(TimeStampedModel):
           MERCHANT = "MERCHANT", "상인"
           YOUTH = "YOUTH", "청년"
 
-     phone_num = models.CharField(max_length=20, blank=True)
+     phone_num = models.CharField(max_length=20, unique=True, db_index=True)
      nickname = models.CharField(max_length=30)
      role = models.CharField(max_length=10, choices=Role.choices, db_index=True)
 
