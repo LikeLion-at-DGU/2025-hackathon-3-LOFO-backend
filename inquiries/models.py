@@ -9,6 +9,9 @@ class TimeStampedModel(models.Model):
      class Meta:
           abstract = True
 
+def request_image_path(instance, filename):
+     # /requests/<request_id>/<filename>
+     return f"requests/{instance.id or 'new'}/{filename}"
 
 class Request(TimeStampedModel):
      class Status(models.TextChoices):
@@ -23,7 +26,8 @@ class Request(TimeStampedModel):
           MARKETING = "MARKETING", "마케팅(기획)"
 
      owner = models.ForeignKey("accounts.Profile", on_delete=models.PROTECT, related_name="requests")
-     store = models.ForeignKey("accounts.Store", on_delete=models.PROTECT, related_name="requests")
+     image = models.ImageField(upload_to=request_image_path, blank=True, null=True)
+     url = models.URLField(default='https://example.com')
      status = models.CharField(max_length=10, choices=Status.choices, default=Status.OPEN, db_index=True)
      category = models.CharField(max_length=20, choices=Category.choices, db_index=True)
      saved_count = models.IntegerField(default=0)

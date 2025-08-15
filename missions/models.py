@@ -15,7 +15,7 @@ class Mission(TimeStampedModel):
           IN_PROGRESS = "IN_PROGRESS", "진행중"
           DONE = "DONE", "완료"
 
-     request = models.ForeignKey("inquiries.Request", on_delete=models.PROTECT, related_name="missions")
+     request = models.OneToOneField("inquiries.Request", on_delete=models.PROTECT, related_name="mission")
      youth = models.ForeignKey("accounts.Profile", on_delete=models.PROTECT, related_name="missions")
      deadline = models.DateTimeField(null=True, blank=True)
      status = models.CharField(max_length=15, choices=Status.choices, default=Status.IN_PROGRESS, db_index=True)
