@@ -27,7 +27,7 @@ def _handle_login(request, role):
 
     except Profile.DoesNotExist:
         if not nickname:
-            return Response({"detail": "신규 회원은 닉네임이 필요합니다."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "신규 회원은 닉네임이 필요합니다."}, status=status.HTTP_200_OK)
 
         # 닉네임 중복 사전 체크
         if Profile.objects.filter(nickname=nickname).exists():
