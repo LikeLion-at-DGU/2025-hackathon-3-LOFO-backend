@@ -3,4 +3,6 @@ from . import views
 
 urlpatterns = [
     path("nopo/home/request", views.nopo_request_create, name="nopo-request-create"),
+    path("nopo/home/request/<int:request_id>/edit", views.nopo_request_edit, name="nopo-request-edit"), 
+    path("nopo/home/request/<int:request_id>/end", views.nopo_request_end, name="nopo-request-end"),    
 ]

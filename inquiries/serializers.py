@@ -24,3 +24,26 @@ class RequestCreateSerializer(serializers.ModelSerializer):
         if len(value) > 16:
             raise serializers.ValidationError("제목은 16자 이내로 작성해주세요.")
         return value
+    
+class RequestUpdateSerializer(serializers.ModelSerializer):
+    # 모두 선택 입력(부분수정 허용)
+    store_name = serializers.CharField(required=False, allow_blank=False, max_length=50)
+    image = serializers.ImageField(required=False, allow_null=True)
+    url = serializers.URLField(required=False, allow_blank=False)
+    category = serializers.ChoiceField(required=False, choices=Request.Category.choices)
+    title = serializers.CharField(required=False, allow_blank=False, max_length=16)
+    content = serializers.CharField(required=False, allow_blank=False, style={"base_template": "textarea.html"})
+
+    class Meta:
+        model = Request
+        fields = ["store_name", "image", "url", "category", "title", "content"]
+
+    def validate_image(self, value):
+        if isinstance(value, (list, tuple)):
+            raise serializers.ValidationError("이미지는 한 장만 업로드할 수 있어요.")
+        return value
+
+    def validate_title(self, value: str):
+        if len(value) > 16:
+            raise serializers.ValidationError("제목은 16자 이내로 작성해주세요.")
+        return value
