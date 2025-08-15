@@ -1,4 +1,3 @@
-# accounts/views.py
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -16,7 +15,7 @@ def _login(request, role_value, redirect_url):
     prof = Profile.objects.filter(phone_num=phone, role=role_value).first()
     if prof:
         return Response(
-            {"status": "OK", "role": prof.role, "profile_id": prof.id, "nickname": prof.nickname, "redirect_url": redirect_url},
+            {"status": "OK", "role": prof.role, "profile_id": prof.id, "nickname": prof.nickname, "is_authorized": prof.is_authorized, "redirect_url": redirect_url},
             status=status.HTTP_200_OK,
         )
 
@@ -51,7 +50,7 @@ def _login(request, role_value, redirect_url):
         prof = Profile.objects.get(phone_num=phone, role=role_value)
 
     return Response(
-        {"status": "CREATED", "role": prof.role, "profile_id": prof.id, "nickname": prof.nickname, "redirect_url": redirect_url},
+        {"status": "CREATED", "role": prof.role, "profile_id": prof.id, "nickname": prof.nickname, "is_authorized": prof.is_authorized, "redirect_url": redirect_url},
         status=status.HTTP_201_CREATED,
     )
 
