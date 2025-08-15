@@ -56,6 +56,8 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
 
+    "django.middleware.csrf.CsrfViewMiddleware",  # DRF 쪽에선 아래 커스텀 인증이 CSRF를 무력화함
+
     'corsheaders.middleware.CorsMiddleware',
 
     'django.middleware.common.CommonMiddleware',
@@ -64,6 +66,16 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# 커스텀 세션 인증 (아래 클래스 경로와 동일하게!)
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "accounts.auth.CsrfExemptSessionAuthentication",  # ← 전역으로 사용
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",  # 로그인 엔드포인트는 공개, 홈은 뷰에서 보호
+    ],
+}
 
 ROOT_URLCONF = 'LOFO.urls'
 
