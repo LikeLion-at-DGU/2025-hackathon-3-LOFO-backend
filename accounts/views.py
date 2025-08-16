@@ -1,63 +1,65 @@
-from rest_framework.decorators import api_view
+from django.contrib.auth.models import User
+from django.contrib.auth import login
+from django.db import transaction, IntegrityError
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from django.db import transaction, IntegrityError
+
 from .models import Profile
 from .serializers import LoginSerializer
 
-def _login(request, role_value, redirect_url):
-    s = LoginSerializer(data=request.data)
-    s.is_valid(raise_exception=True)
-    phone = s.validated_data["phone_num"]
-    nickname = s.validated_data.get("nickname")
+DJANGO_BACKEND = "django.contrib.auth.backends.ModelBackend"
 
-    # 1) 같은 (phone, role) 조합이 이미 있으면 바로 로그인 OK
-    prof = Profile.objects.filter(phone_num=phone, role=role_value).first()
-    if prof:
-        return Response(
-            {"status": "OK", "role": prof.role, "profile_id": prof.id, "nickname": prof.nickname, "is_authorized": prof.is_authorized, "redirect_url": redirect_url},
-            status=status.HTTP_200_OK,
-        )
+def _handle_login(request, role):
+    serializer = LoginSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
 
-    # 2) 해당 조합이 없으면 -> 가입
-    if not nickname:
-        return Response(
-            {"status": "NEED_SIGNUP", "next": "NEED_NICKNAME"},
-            status=status.HTTP_202_ACCEPTED,
-        )
+    phone_num = serializer.validated_data["phone_num"]
+    nickname = serializer.validated_data.get("nickname", "").strip()
 
-    # 닉네임 전역 중복 체크
-    if Profile.objects.filter(nickname=nickname).exists():
-        return Response(
-            {"detail": "이미 사용 중인 닉네임입니다.", "field": "nickname", "code": "nickname_taken"},
-            status=status.HTTP_409_CONFLICT,
-        )
-
-    # 생성 (경합 대비 트랜잭션 + 무결성 처리)
     try:
-        with transaction.atomic():
-            prof = Profile.objects.create(
-                phone_num=phone, nickname=nickname, role=role_value
-            )
-    except IntegrityError:
-        # 경합으로 닉네임/조합 유니크 충돌 시 재확인
+        profile = Profile.objects.select_related("user").get(phone_num=phone_num, role=role)
+        user = profile.user
+        login(request, user, backend=DJANGO_BACKEND)
+        home_url = "/youth/home" if role == Profile.Role.YOUTH else "/nopo/home"
+        return Response({"message": "기존 회원 로그인 성공", "redirect": home_url}, status=status.HTTP_200_OK)
+
+    except Profile.DoesNotExist:
+        if not nickname:
+            return Response({"detail": "신규 회원은 닉네임이 필요합니다."}, status=status.HTTP_200_OK)
+
+        # 닉네임 중복 사전 체크
         if Profile.objects.filter(nickname=nickname).exists():
-            return Response(
-                {"detail": "이미 사용 중인 닉네임입니다.", "field": "nickname", "code": "nickname_taken"},
-                status=status.HTTP_409_CONFLICT,
-            )
-        # (phone, role) 조합이 이미 생겼다면 로그인으로 처리
-        prof = Profile.objects.get(phone_num=phone, role=role_value)
+            return Response({"detail": "이미 사용 중인 닉네임입니다."}, status=status.HTTP_409_CONFLICT)
+        
+        try:
+            with transaction.atomic():
+                user = User.objects.create(username=f"{role.lower()}_{phone_num}")
+                user.set_unusable_password()
+                user.save()
 
-    return Response(
-        {"status": "CREATED", "role": prof.role, "profile_id": prof.id, "nickname": prof.nickname, "is_authorized": prof.is_authorized, "redirect_url": redirect_url},
-        status=status.HTTP_201_CREATED,
-    )
+                Profile.objects.create(
+                    user=user,
+                    phone_num=phone_num,
+                    nickname=nickname,
+                    role=role
+                )
+
+            login(request, user, backend=DJANGO_BACKEND)
+        except IntegrityError:
+            # 혹시 동시에 같은 닉네임으로 가입 시도하면 DB에서 막히므로 처리
+            return Response({"detail": "이미 사용 중인 닉네임입니다."}, status=status.HTTP_409_CONFLICT)
+        
+        home_url = "/youth/home" if role == Profile.Role.YOUTH else "/nopo/home"
+        return Response({"message": "신규 회원 가입 및 로그인 성공", "redirect": home_url}, status=status.HTTP_201_CREATED)
 
 @api_view(["POST"])
+@permission_classes([AllowAny])  
 def login_youth(request):
-    return _login(request, Profile.Role.YOUTH, "/youth/home")
+    return _handle_login(request, Profile.Role.YOUTH)
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def login_nopo(request):
-    return _login(request, Profile.Role.MERCHANT, "/nopo/home")
+    return _handle_login(request, Profile.Role.MERCHANT)
