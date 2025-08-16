@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'inquiries',
     'missions',
     'outcomes',
-
+    'django_filters',
     'corsheaders',
 ]
 

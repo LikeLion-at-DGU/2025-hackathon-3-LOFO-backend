@@ -9,10 +9,11 @@ class TimeStampedModel(models.Model):
      class Meta:
           abstract = True
 
-
 class Mission(TimeStampedModel):
      class Status(models.TextChoices):
           IN_PROGRESS = "IN_PROGRESS", "진행중"
+          DISCARD = "DISCARD", "포기"
+          EXPIRE = "EXPIRE", "기한만료"
           DONE = "DONE", "완료"
 
      request = models.OneToOneField("inquiries.Request", on_delete=models.PROTECT, related_name="mission")
