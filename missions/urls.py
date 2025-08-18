@@ -5,4 +5,5 @@ urlpatterns = [
      path('home', home, name='home'),
      path('home/ai-mission', home_ai, name = 'home-ai-mission'),
      path('mission/<int:id>', mission_detail, name ='mission-detail'),
+     path('home/save-mission', save_mission, name='save-mission'),
 ]
