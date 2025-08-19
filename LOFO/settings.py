@@ -162,6 +162,5 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLWED_ORIGINS = {
-    'https://프론트엔드주소',
-    'hppts://프론트엔드주소',
+    'https://2025-hackathon-3-lofo.netlify.app/'
 }
