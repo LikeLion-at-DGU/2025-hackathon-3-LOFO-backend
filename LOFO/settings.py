@@ -56,12 +56,10 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
 
-    "django.middleware.csrf.CsrfViewMiddleware",  # DRF 쪽에선 아래 커스텀 인증이 CSRF를 무력화함
-
     'corsheaders.middleware.CorsMiddleware',
-
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+
+    'django.middleware.csrf.CsrfViewMiddleware',  # DRF 쪽에선 아래 커스텀 인증이 CSRF를 무력화함
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -74,6 +72,17 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",  # 로그인 엔드포인트는 공개, 홈은 뷰에서 보호
+    ],
+    # JSON 파서 추가 (없으면 request.data 비어버림)
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework.parsers.JSONParser",
+        "rest_framework.parsers.FormParser",
+        "rest_framework.parsers.MultiPartParser",
+    ],
+    # (Browsable API 쓰면 유지 권장)
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
     ],
 }
 
