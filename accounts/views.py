@@ -1,8 +1,10 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import login
+from django.contrib.auth import logout
 from django.db import transaction, IntegrityError
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -63,3 +65,9 @@ def login_youth(request):
 @permission_classes([AllowAny])
 def login_nopo(request):
     return _handle_login(request, Profile.Role.MERCHANT)
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])  # 로그인 상태에서만 접근 가능
+def logout_view(request):
+    logout(request)
+    return Response({"message": "로그아웃 되었습니다."}, status=status.HTTP_200_OK)
