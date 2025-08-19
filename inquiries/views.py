@@ -1,3 +1,4 @@
+from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
@@ -9,6 +10,68 @@ from rest_framework import status
 from .models import Request
 from .serializers import RequestCreateSerializer, RequestUpdateSerializer
 from accounts.models import Profile
+
+
+# 상인 홈: 요청작성 링크 + 진행현황 집계 + 최근 요청글 3개 요청
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def nopo_home(request):
+    profile = getattr(request.user, "profile", None)
+    if profile is None:
+        return Response({"detail": "프로필이 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # 상인만 접근 가능
+    if profile.role != Profile.Role.MERCHANT:
+        raise PermissionDenied("상인만 접근할 수 있습니다.")
+
+    # 내 요청들
+    my_qs = Request.objects.filter(owner=profile)
+
+    # 진행현황 집계
+    count_open = my_qs.filter(status=Request.Status.OPEN).count()
+    count_ongoing = my_qs.filter(status=Request.Status.ONGOING).count()
+    count_closed = my_qs.filter(status=Request.Status.CLOSED).count()
+    total_count = count_open + count_ongoing + count_closed
+
+    # 최근 3개
+    recent_qs = my_qs.order_by("-created_at")[:3]
+    recent = []
+    for obj in recent_qs:
+        image_url = ""
+        try:
+            if obj.image and hasattr(obj.image, "url"):
+                image_url = request.build_absolute_uri(obj.image.url)
+        except Exception:
+            image_url = ""
+
+        recent.append({
+            "id": obj.id,
+            "store_name": obj.store_name,
+            "title": obj.title,
+            "category": obj.category,                    # ex) "PROMO_VIDEO"
+            "category_label": obj.get_category_display(),# ex) "홍보영상"
+            "status": obj.status,                        # ex) "OPEN"
+            "status_label": obj.get_status_display(),    # ex) "모집중"
+            "image_url": image_url,
+            "url": obj.url,
+            "saved_count": obj.saved_count,
+            "created_at": obj.created_at,
+            "content": obj.content,
+        })
+
+    data = {
+        "links": {
+            "request_create": reverse("nopo-request-create"),  # /nopo/request/create
+        },
+        "my_progress": {
+            "open": count_open,          # 모집중
+            "ongoing": count_ongoing,    # 진행중
+            "closed": count_closed,      # 종료/중단
+            "total": total_count,        # 총요청수
+        },
+        "my_recent_requests": recent,     # 최신 3개
+    }
+    return Response(data, status=status.HTTP_200_OK)
 
 
 # ✅ 요청입력
