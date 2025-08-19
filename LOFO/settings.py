@@ -170,6 +170,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLWED_ORIGINS = {
-    'https://2025-hackathon-3-lofo.netlify.app/'
-}
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://2025-hackathon-3-lofo.netlify.app",
+]
