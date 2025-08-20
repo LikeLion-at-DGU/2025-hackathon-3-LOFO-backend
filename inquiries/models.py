@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils import timezone
+from accounts.models import Profile
+from outcomes.models import Outcome
 
 
 class TimeStampedModel(models.Model):
@@ -85,3 +87,42 @@ def sync_request_saved_count(sender, instance, **kwargs):
      req = instance.request
      count = Saved.objects.filter(request=req).count()
      Request.objects.filter(id=req.id).update(saved_count=count)
+
+
+# 후기 작성
+class NopoFeedback(TimeStampedModel):
+     class OverallSatisfaction(models.TextChoices):
+          VERY_GOOD = "VERY_GOOD", "매우 만족"
+          GOOD      = "GOOD",      "만족"
+          NORMAL    = "NORMAL",    "보통"
+          BAD       = "BAD",       "아쉬움"
+          VERY_BAD  = "VERY_BAD",  "매우 아쉬움"
+
+     class ReflectionLevel(models.TextChoices):
+          VERY_REFLECTED = "VERY_REFLECTED", "매우 반영"
+          SOMEWHAT       = "SOMEWHAT",       "어느정도 반영"
+          NORMAL         = "NORMAL",         "보통"
+          LACK           = "LACK",           "부족함"
+          VERY_LACK      = "VERY_LACK",      "매우 부족함"
+
+     class PracticalUse(models.TextChoices):
+          VERY_POSSIBLE = "VERY_POSSIBLE", "매우 가능"
+          POSSIBLE      = "POSSIBLE",      "어느정도 가능"
+          NORMAL        = "NORMAL",        "보통"
+          CONCERN       = "CONCERN",       "고민됨"
+          HARD          = "HARD",          "활용 어려움"
+
+     outcome = models.ForeignKey(Outcome, on_delete=models.CASCADE, related_name="nopo_feedbacks")
+     author  = models.ForeignKey(Profile, on_delete=models.PROTECT, related_name="nopo_feedbacks")
+
+     overall_satisfaction = models.CharField(max_length=20, choices=OverallSatisfaction.choices)
+     reflection_level     = models.CharField(max_length=20, choices=ReflectionLevel.choices)
+     practical_use        = models.CharField(max_length=20, choices=PracticalUse.choices)
+     comment              = models.TextField(blank=True, null=True)
+
+     class Meta:
+          unique_together = ("outcome", "author")
+          ordering = ["-created_at"]
+
+     def __str__(self):
+          return f"Feedback by {self.author_id} for outcome {self.outcome_id}"
