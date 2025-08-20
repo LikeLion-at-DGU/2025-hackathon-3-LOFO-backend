@@ -8,4 +8,6 @@ urlpatterns = [
      path('home/save-mission', save_mission, name='save-mission'),
      path("plan", generate_plan, name="generate_plan"),
      path('mission', mission, name='mission'),
+     path('mission/done', mission_done, name='mission-done'),
+     path("mission/submit", mission_submit, name="mission_submit"),
      ]
