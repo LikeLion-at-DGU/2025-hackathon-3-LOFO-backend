@@ -1,7 +1,6 @@
-from .services.openai_service import build_plan
-
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -16,6 +15,10 @@ from inquiries.models import Request, AiRequest, Saved
 from accounts.models import Profile
 from .models import Mission, MissionStep
 from .serializers import RequestListSerializer, AiRequestListSerializer
+
+import os, base64, mimetypes
+import fitz  # PyMuPDF
+from .services.openai_service import *
 
 
 # 청년 홈: 상인 요청 리스트
@@ -222,3 +225,159 @@ def generate_plan(request):
             } for s in mission.steps.order_by("step_no")
         ],
     }, status=status.HTTP_201_CREATED)
+
+ALLOWED_FEEDBACK_EXTS = {".png", ".jpg", ".jpeg", ".pdf", ".mp4"}  # 중간 피드백 허용
+MAX_FILE_MB = 6
+
+def _ext_of(name: str) -> str:
+    return os.path.splitext(name or "")[1].lower()
+
+def _validate_uploads(files):
+    bad_ext, too_big = [], []
+    for f in files:
+        ext = _ext_of(f.name)
+        size_mb = getattr(f, "size", 0) / (1024 * 1024)
+        if ext not in ALLOWED_FEEDBACK_EXTS:
+            bad_ext.append(f.name)
+        if size_mb > MAX_FILE_MB:
+            too_big.append(f.name)
+    return bad_ext, too_big
+
+def _img_to_data_url(uploaded_file) -> str | None:
+    name = (uploaded_file.name or "").lower()
+    ct   = getattr(uploaded_file, "content_type", "") or mimetypes.guess_type(name)[0] or ""
+    if not (name.endswith((".png", ".jpg", ".jpeg")) or (ct and ct.startswith("image/"))):
+        return None
+    raw = uploaded_file.read()
+    uploaded_file.seek(0)
+    b64 = base64.b64encode(raw).decode("utf-8")
+    mime = ct or ("image/png" if name.endswith(".png") else "image/jpeg")
+    return f"data:{mime};base64,{b64}"
+
+def _pdf_to_text(uploaded_file, max_pages=5, max_chars=4000) -> str | None:
+    name = (uploaded_file.name or "").lower()
+    if not name.endswith(".pdf"):
+        return None
+    raw = uploaded_file.read()
+    uploaded_file.seek(0)
+    text = ""
+    try:
+        with fitz.open(stream=raw, filetype="pdf") as doc:
+            for i, page in enumerate(doc):
+                if i >= max_pages:
+                    break
+                text += page.get_text("text") or ""
+                if len(text) >= max_chars:
+                    text = text[:max_chars] + "…"
+                    break
+    except Exception:
+        return None
+    return text.strip() or None
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def mission(request):
+    """
+    POST /youth/mission
+    form-data:
+      - mission_id: int (필수)
+      - step_no: 1|2 (필수)
+      - note: string (선택)
+      - files: [file...] (선택, 여러 개 가능)
+    동작:
+      - 확장자/용량 검증 (허용: png/jpg/jpeg/pdf/mp4, 6MB 이하)
+      - 2단계 피드백은 1단계가 DONE이어야 허용(순서 강제)
+      - 파일은 저장하지 않음 (이미지/텍스트만 분석)
+      - AI 피드백 생성 후 반환, feedback_count +1
+    """
+    mission_id = request.data.get("mission_id")
+    step_no_raw = request.data.get("step_no")
+    note = request.data.get("note", "")
+
+    if not mission_id or not step_no_raw:
+        return Response({"detail": "mission_id와 step_no가 필요합니다."},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        step_no = int(step_no_raw)
+    except ValueError:
+        return Response({"detail": "step_no는 정수여야 합니다."},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    if step_no not in (1, 2):
+        return Response({"detail": "step_no는 1 또는 2만 가능합니다."},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    mission = get_object_or_404(Mission, pk=mission_id)
+    step = get_object_or_404(MissionStep, mission=mission, step_no=step_no)
+
+    # --- 순서 강제: 2단계는 1단계가 DONE이어야 함 ---
+    if step_no == 2:
+        try:
+            s1 = MissionStep.objects.get(mission=mission, step_no=1)
+            if s1.status != MissionStep.StepStatus.DONE:
+                return Response({"detail": "2단계 피드백은 1단계를 먼저 완료해 주세요."},
+                                status=status.HTTP_409_CONFLICT)
+        except MissionStep.DoesNotExist:
+            return Response({"detail": "1단계 정보가 없습니다."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    files = request.FILES.getlist("files")
+
+    # --- 확장자/용량 검증 ---
+    bad_ext, too_big = _validate_uploads(files)
+    if too_big:
+        return Response({"detail": f"파일 용량 초과(>{MAX_FILE_MB}MB): {', '.join(too_big)}"},
+                        status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
+    if bad_ext:
+        return Response({"detail": f"허용되지 않는 확장자: {', '.join(bad_ext)}"},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    # --- 멀티모달 입력 구성 ---
+    image_data_urls, pdf_texts, file_names = [], [], []
+    for f in files:
+        file_names.append(f.name)
+        # 이미지 → base64 data URL
+        url = _img_to_data_url(f)
+        if url:
+            image_data_urls.append(url)
+            continue
+        # PDF → 텍스트 추출
+        t = _pdf_to_text(f)
+        if t:
+            pdf_texts.append(t)
+        # mp4 등은 이름만 전달(내용 분석 X)
+
+    # 목표 문장 구성(요청 제목/내용 활용)
+    req = mission.request
+    goal_text = (getattr(req, "title", None) or getattr(req, "name", None) or "").strip()
+    desc_text = (getattr(req, "content", None) or getattr(req, "description", None) or "").strip()
+    goal = goal_text or desc_text or "요청 목표"
+
+    # --- AI 피드백 생성 ---
+    try:
+        feedback = build_step_feedback(
+            goal=goal,
+            step_no=step_no,
+            step_title=step.title or f"{step_no}단계",
+            note=note,
+            image_data_urls=image_data_urls,
+            file_names=file_names,
+            extra_texts=pdf_texts,
+        )
+    except Exception as e:
+        return Response({"detail": f"AI 피드백 생성 실패: {e}"},
+                        status=status.HTTP_502_BAD_GATEWAY)
+
+    # --- 요청 횟수 증가 ---
+    step.feedback_count = (step.feedback_count or 0) + 1
+    step.save(update_fields=["feedback_count", "updated_at"])
+
+    return Response({
+        "mission_id": mission.id,
+        "step_no": step_no,
+        "feedback": feedback,
+        "feedback_count": step.feedback_count,
+    }, status=status.HTTP_200_OK)

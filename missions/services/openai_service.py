@@ -1,6 +1,6 @@
 # missions/services/openai_service.py
 from openai import OpenAI
-import os, json, re
+import os, json, re, base64
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -184,3 +184,70 @@ def build_plan(
         except Exception:
             data2 = _json_only(raw2)
         return _normalize_plan(data2)
+
+
+def _img_to_data_url(uploaded_file) -> str | None:
+    name = (uploaded_file.name or "").lower()
+    ct   = getattr(uploaded_file, "content_type", "") or ""
+    if not (name.endswith((".png", ".jpg", ".jpeg")) or ct.startswith("image/")):
+        return None
+    if getattr(uploaded_file, "size", 0) > 6 * 1024 * 1024:  # 6MB 초과는 스킵
+        return None
+    raw = uploaded_file.read()
+    uploaded_file.seek(0)  # 혹시 재사용할 수 있으니 포인터 복구
+    b64 = base64.b64encode(raw).decode("utf-8")
+    mime = ct or ("image/png" if name.endswith(".png") else "image/jpeg")
+    return f"data:{mime};base64,{b64}"
+
+
+def build_step_feedback(
+    goal: str,
+    step_no: int,
+    step_title: str,
+    note: str = "",
+    image_data_urls: list[str] | None = None,   # data:image/...;base64,....
+    file_names: list[str] | None = None,        # 업로드 파일명 목록(표시용)
+    extra_texts: list[str] | None = None,       # PDF에서 뽑은 텍스트 등
+) -> str:
+    image_data_urls = image_data_urls or []
+    file_names      = file_names or []
+    extra_texts     = extra_texts or []
+
+    system = (
+        "당신은 디자인·콘텐츠 제작 프로젝트의 멘토입니다. "
+        "친근한 존댓말로, 실무에 바로 적용 가능한 피드백을 주세요. "
+        "항상 구체적인 개선 포인트와 다음 액션을 함께 제시하세요."
+    )
+
+    content = [
+        {"type": "text", "text":
+            f"[목표]\n{goal}\n\n"
+            f"[현재 단계]\n{step_no}단계: {step_title}\n\n"
+            f"[메모/요청]\n{note or '메모 없음'}\n\n"
+            "[응답 형식]\n"
+            "- 총평 (한 줄)\n- 잘한 점 (목록)\n- 개선 포인트 (목록)\n"
+            "- 다음 액션 (목록, 바로 실행 가능한 수준)\n- 업로드 체크리스트 (파일 규격/형식 포함)\n"
+        }
+    ]
+
+    if file_names:
+        content.append({"type": "text", "text": "[제출 파일]\n" + ", ".join(file_names)})
+
+    for url in image_data_urls:
+        content.append({"type": "image_url", "image_url": {"url": url}})
+
+    for t in extra_texts:
+        # 너무 길면 잘라서 전달
+        snippet = (t[:4000] + "…") if len(t) > 4000 else t
+        content.append({"type": "text", "text": f"[파일 내용 발췌]\n{snippet}"})
+
+    resp = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": content},
+        ],
+        temperature=0.35,
+        max_tokens=800,
+    )
+    return resp.choices[0].message.content.strip()
