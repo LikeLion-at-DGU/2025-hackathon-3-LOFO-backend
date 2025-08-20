@@ -182,3 +182,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+OUTCOME_PDF_THUMB_STATIC = "static/images/pdf-thumb.png"            # PDF 전용 아이콘(첨부 2번째 이미지)
+OUTCOME_VIDEO_FALLBACK_THUMB_STATIC = "/tatic/images/video-thumb-fallback.png"  # ffmpeg 실패시

@@ -12,14 +12,13 @@ from .serializers import OutcomeCardSerializer
 def comunity(request):  # outcome list
     category = request.GET.get("category")
 
-    # 이미지 파일만 프리패치 (OutcomeFile.kind == "IMAGE")
-    image_qs = OutcomeFile.objects.filter(kind="IMAGE").order_by("id")
+    cover_qs = OutcomeFile.objects.order_by("order", "id")
 
     qs = (
         Outcome.objects
         .select_related("mission__request") #제목/카테고리/가게명 접근용
         .prefetch_related(
-            Prefetch("files", queryset=image_qs)
+            Prefetch("files", queryset=cover_qs)
         )
         .only(
             "id", "nopo_pick", "created_at",
@@ -49,7 +48,7 @@ def comunity(request):  # outcome list
 
     for o in qs:
         # files는 위에서 이미지로만 프리패치됨 → 여기서 슬라이싱해도 추가 쿼리 발생 X
-        o._prefetched_images = list(o.files.all()[:1])
+        o._prefetched_cover_files = list(o.files.all()[:1])
 
     ser = OutcomeCardSerializer(qs, many=True, context={"request": request})
     return Response(ser.data, status=status.HTTP_200_OK)

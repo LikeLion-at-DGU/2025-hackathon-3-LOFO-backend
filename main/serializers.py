@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from django.conf import settings
 from outcomes.models import Outcome, OutcomeFile
-
+from django.urls import reverse
 
 class OutcomeCardSerializer(serializers.ModelSerializer):
     cover_image_url = serializers.SerializerMethodField()
@@ -28,26 +29,41 @@ class OutcomeCardSerializer(serializers.ModelSerializer):
 
     def get_cover_image_url(self, obj: Outcome):
         """
-        OutcomeFile 중 kind="IMAGE" 인 첫 번째 파일을 대표 이미지로 사용
-        뷰에서 _prefetched_images 를 세팅해두면 추가 쿼리 없이 가져옴
+        대표 썸네일 우선순위
+        1) IMAGE → 원본 이미지
+        2) VIDEO → /outcomes/files/<id>/video-thumb
+        3) PDF   → 고정 아이콘 이미지
         """
-        # 뷰에서 미리 넣어둔 경우 우선 사용
-        img = next(iter(getattr(obj, "_prefetched_images", [])), None)
-
-        # 없으면 직접 조회
-        if not img:
-            img = obj.files.filter(kind="IMAGE").order_by("id").first()
-
-        if not img or not getattr(img, "file", None):
-            return None
-
-        try:
-            url = img.file.url
-        except Exception:
-            return None
-
         request = self.context.get("request")
-        return request.build_absolute_uri(url) if request else url
+
+        # ① 뷰에서 미리 슬라이스해서 넣어준 경우(권장)
+        f = next(iter(getattr(obj, "_prefetched_cover_files", [])), None)
+
+        # ② 없으면 직접 조회 (order, id 오름차순)
+        if not f:
+            f = obj.files.order_by("order", "id").first()
+        if not f:
+            return None
+
+        # IMAGE → 그대로
+        if f.kind == OutcomeFile.Kind.IMAGE:
+            try:
+                url = f.file.url
+                return request.build_absolute_uri(url) if request else url
+            except Exception:
+                return None
+
+        # VIDEO → 썸네일 엔드포인트
+        if f.kind == OutcomeFile.Kind.VIDEO:
+            thumb_url = reverse("outcomes:video-thumb", args=[f.id])
+            return request.build_absolute_uri(thumb_url) if request else thumb_url
+
+        # PDF → 고정 아이콘
+        if f.kind == OutcomeFile.Kind.PDF:
+            static_path = getattr(settings, "OUTCOME_PDF_THUMB_STATIC", "static/images/pdf-thumb.png")
+            return request.build_absolute_uri(static_path) if request else static_path
+
+        return None
 
     def get_title(self, obj: Outcome):
         return getattr(obj.mission.request, "title", "")
