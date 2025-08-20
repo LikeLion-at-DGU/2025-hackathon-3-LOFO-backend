@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.db import transaction
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -19,6 +20,7 @@ from .serializers import RequestListSerializer, AiRequestListSerializer
 import os, base64, mimetypes
 import fitz  # PyMuPDF
 from .services.openai_service import *
+from outcomes.models import *
 
 
 # 청년 홈: 상인 요청 리스트
@@ -381,3 +383,126 @@ def mission(request):
         "feedback": feedback,
         "feedback_count": step.feedback_count,
     }, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def mission_done(request):
+     mission_id = request.data.get("mission_id")
+     step_no = request.data.get("step_no")
+
+     if not mission_id or not step_no:
+          return Response({"detail": "mission_id와 step_no가 필요합니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+     mission = get_object_or_404(Mission, pk=mission_id)
+
+     # 순서 강제: 2단계 완료는 1단계가 DONE일 때만
+     if step_no == 2:
+          s1 = get_object_or_404(MissionStep, mission=mission, step_no=1)
+          if s1.status != MissionStep.StepStatus.DONE:
+               return Response({"detail": "2단계를 완료하려면 1단계를 먼저 완료해 주세요."}, status=status.HTTP_409_CONFLICT)
+
+     step = get_object_or_404(MissionStep, mission=mission, step_no=step_no)
+
+     # 완료 처리
+     step.mark_done()
+
+     return Response({
+          "detail": f"{step_no}단계 미션 완료.",
+          "mission_id": mission.id,
+          "step_no": step_no,
+          "status": step.status,
+          "completed_at": step.completed_at,
+          "all_steps": list(mission.steps.order_by("step_no").values("step_no", "status", "completed_at")),
+     }, status=status.HTTP_200_OK)
+
+
+# 파일 kind 추정을 위한 간단 유틸 (OutcomeFile.Kind 값과 맞춤)
+def _guess_kind_by_ext(name: str) -> str:
+     n = (name or "").lower()
+     if n.endswith((".png", ".jpg", ".jpeg")):
+          return "IMAGE"
+     if n.endswith(".pdf"):
+          return "PDF"
+     if n.endswith(".mp4"):
+          return "VIDEO"
+     return "IMAGE"  # 기본값
+
+
+@api_view(["POST"])
+@parser_classes([MultiPartParser, FormParser])
+def mission_submit(request):
+     mission_id = request.data.get("mission_id")
+     if not mission_id:
+          return Response({"detail": "mission_id가 필요합니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+     mission = get_object_or_404(Mission, pk=mission_id)
+
+     # 업로드 파일 필수
+     files = request.FILES.getlist("files")
+     if not files:
+          return Response({"detail": "최종 제출에는 files가 필요합니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+     # 확장자/용량 검증
+     bad_ext, too_big = _validate_uploads(files)
+     if too_big:
+          return Response({"detail": f"파일 용량 초과(>{MAX_FILE_MB}MB): {', '.join(too_big)}"},
+                         status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
+     if bad_ext:
+          return Response({"detail": f"허용되지 않는 확장자: {', '.join(bad_ext)}"},
+                         status=status.HTTP_400_BAD_REQUEST)
+
+     # 3단계 객체
+     s3 = get_object_or_404(MissionStep, mission=mission, step_no=3)
+
+     # Outcome.owner 
+     owner_profile = getattr(mission.request, "owner", None) or request.user.profile
+
+     with transaction.atomic():
+          # 1. Outcome 생성 (결과물 묶음)
+          outcome = Outcome.objects.create(
+               mission=mission,
+               youth=request.user.profile,# 제출자(청년)
+               owner=owner_profile, # 요청 주인(상인)
+               nopo_pick=False,
+          )
+
+          # 2.OutcomeFile 생성 (업로드 파일 각각 저장)
+          file_objs = []
+          for idx, f in enumerate(files):
+               file_objs.append(OutcomeFile(
+                    outcome=outcome,
+                    kind=_guess_kind_by_ext(f.name), # IMAGE / PDF / VIDEO
+                    file=f, # 실제 파일
+                    mime_type=getattr(f, "content_type", "") or "",
+                    size_bytes=getattr(f, "size", None),
+                    order=idx, # 정렬 순서
+               ))
+          OutcomeFile.objects.bulk_create(file_objs)
+     
+          # 3. 3단계 완료처리
+          s3.mark_done()
+
+          # 4. 미션 전체 완료
+          mission.status = Mission.Status.DONE
+          mission.save(update_fields=["status", "updated_at"])
+
+          # 5. Request 상태도 'CLOSED'로 변경
+          try:
+               req = mission.request
+               req.status = Request.Status.CLOSED
+               req.save(update_fields=["status", "updated_at"])
+          except Exception as e:
+               raise RuntimeError(f"Request 상태 업데이트 실패: {str(e)}")
+
+     # 6. 최종 응답
+     return Response({
+          "detail": "최종 결과물을 제출했어요.",
+          "outcome_id": outcome.id,
+          "files": [
+               {"id": f.id, "kind": f.kind, "name": f.file.name, "size": f.size_bytes}
+               for f in outcome.files.all()
+          ],
+          "mission_status": mission.status,  # "DONE"
+          "steps": list(mission.steps.order_by("step_no").values("step_no", "status", "completed_at")),
+          "request_status": getattr(mission.request, "status", None),  # "CLOSED" 기대
+     }, status=status.HTTP_201_CREATED)
