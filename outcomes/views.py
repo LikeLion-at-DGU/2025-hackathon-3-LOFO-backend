@@ -11,6 +11,7 @@ from rest_framework import status
 
 from .models import Outcome, OutcomeFile
 from main.models import Like  # 좋아요 수/상태 재사용
+from inquiries.models import NopoFeedback
 from main.serializers import OutcomeCardSerializer
 
 import io
@@ -21,14 +22,14 @@ import os
 def youth_mypage_redirect(request):
     return redirect("outcomes:youth-portfolio") 
 
+# 청년 마이페이지 > 포트폴리오
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def youth_portfolio(request):
-    """
-    청년 > 마이페이지 > 포트폴리오
-    GET /youth/mypage/portfolio
-    현재 로그인한 청년의 Outcome 리스트를 커뮤니티 카드 포맷으로 반환
-    """
+
+    # 청년 > 마이페이지 > 포트폴리오
+    # GET /youth/mypage/portfolio
+    # 현재 로그인한 청년의 Outcome 리스트를 커뮤니티 카드 포맷으로 반환
     profile = getattr(request.user, "profile", None)
     if not profile:
         return Response({"detail": "프로필이 필요합니다."}, status=status.HTTP_400_BAD_REQUEST)
@@ -59,12 +60,12 @@ def youth_portfolio(request):
     return Response(ser.data, status=status.HTTP_200_OK)
 
 
+#동영상 처리.. 추후 코드 수정 필요
 @api_view(["GET"])
 def video_thumb(request, file_id: int):
-    """
-    영상(OutcomeFile.kind=VIDEO)의 첫 프레임을 JPEG로 반환.
-    moviepy / opencv 없거나 실패하면 정적 대체이미지로 리다이렉트.
-    """
+
+    # 영상(OutcomeFile.kind=VIDEO)의 첫 프레임을 JPEG로 반환.
+    # moviepy / opencv 없거나 실패하면 정적 대체이미지로 리다이렉트.
     try:
         of = OutcomeFile.objects.get(pk=file_id, kind=OutcomeFile.Kind.VIDEO)
     except OutcomeFile.DoesNotExist:
@@ -105,3 +106,39 @@ def video_thumb(request, file_id: int):
     # 3) 실패 → 고정 썸네일
     fallback = getattr(settings, "OUTCOME_VIDEO_FALLBACK_THUMB_STATIC", "static/images/video-thumb-fallback.png")
     return HttpResponseRedirect(fallback)
+
+# 청년 마이페이지 > 성장지표 > 피드백 detail
+@api_view(["GET"])
+def outcome_feedback_detail(request, outcome_id: int):
+
+    # Outcome 존재 확인(방어적)
+    try:
+        Outcome.objects.only("id").get(pk=outcome_id)
+    except Outcome.DoesNotExist:
+        return Response({"detail": "존재하지 않는 결과물입니다."}, status=status.HTTP_404_NOT_FOUND)
+
+    fb = NopoFeedback.objects.filter(outcome_id=outcome_id).select_related("author").first()
+    if not fb:
+        return Response({"detail": "아직 상인 피드백이 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+
+    # 코드값 + 라벨 둘 다 내려줌 
+    data = {
+        "id": fb.id,
+        "outcome_id": outcome_id,
+        "author_id": fb.author_id,
+        "overall_satisfaction": {
+            "value": fb.overall_satisfaction,
+            "label": fb.get_overall_satisfaction_display(),
+        },
+        "reflection_level": {
+            "value": fb.reflection_level,
+            "label": fb.get_reflection_level_display(),
+        },
+        "practical_use": {
+            "value": fb.practical_use,
+            "label": fb.get_practical_use_display(),
+        },
+        "comment": fb.comment,
+        "created_at": fb.created_at,
+    }
+    return Response(data, status=status.HTTP_200_OK)
