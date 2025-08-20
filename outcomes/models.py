@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.core.validators import FileExtensionValidator
 
 
 class TimeStampedModel(models.Model):
@@ -15,19 +16,37 @@ class Outcome(TimeStampedModel):
      youth = models.ForeignKey("accounts.Profile", on_delete=models.PROTECT, related_name="outcomes_as_youth")
      owner = models.ForeignKey("accounts.Profile", on_delete=models.PROTECT, related_name="outcomes_as_owner")
      nopo_pick = models.BooleanField(default=False)  # 노포 픽(Y/N)
-     content = models.TextField(blank=True)
 
      def __str__(self):
           return f"Outcome#{self.id} (mission {self.mission_id})"
 
 
-def outcome_image_path(instance, filename):
+def outcome_file_path(instance, filename):
      return f"outcomes/{instance.outcome_id}/{filename}"
 
 
-class OutcomeImage(TimeStampedModel):
-     outcome = models.ForeignKey("outcomes.Outcome", on_delete=models.CASCADE, related_name="images")
-     image = models.ImageField(upload_to=outcome_image_path)
+class OutcomeFile(TimeStampedModel):
+     class Kind(models.TextChoices):
+          IMAGE = "IMAGE", "이미지"
+          VIDEO = "VIDEO", "비디오"
+          PDF = "PDF", "PDF"
+
+     outcome = models.ForeignKey(Outcome, on_delete=models.CASCADE, related_name="files")
+     kind = models.CharField(max_length=10, choices=Kind.choices)
+
+     file = models.FileField(
+          upload_to=outcome_file_path,
+          validators=[FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "mp4", "pdf"])]
+     )
+     mime_type = models.CharField(max_length=100, blank=True)
+     size_bytes = models.BigIntegerField(null=True, blank=True)
+
+     # 순서
+     order = models.PositiveIntegerField(default=0, db_index=True)
+
+     class Meta:
+          ordering = ["order", "id"]
+          indexes = [models.Index(fields=["outcome", "order"])]
 
      def __str__(self):
-          return f"Image for outcome {self.outcome_id}"
+          return f"{self.kind} file for outcome {self.outcome_id}"

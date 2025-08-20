@@ -145,7 +145,7 @@ TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
-USE_TZ = False
+USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
@@ -177,3 +177,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5174",
     "https://2025-hackathon-3-lofo.netlify.app",
 ]
+
+from dotenv import load_dotenv
+
+load_dotenv()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
