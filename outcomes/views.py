@@ -168,7 +168,7 @@ def youth_insights(request):
         # 로고/닉네임/전화번호
         "logo_url": "/static/images/lofo-logo.png",
         "nickname": getattr(profile, "nickname", ""),
-        "phone_number": getattr(profile, "phone_number", ""),
+        "phone_num": getattr(profile, "phone_num", ""),
 
         # 수치
         "stats": {
