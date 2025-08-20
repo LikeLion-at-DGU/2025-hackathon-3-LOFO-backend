@@ -1,6 +1,8 @@
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
+from django.utils import timezone
+from django.db.models import Max
 
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
@@ -13,8 +15,8 @@ from .serializers import RequestCreateSerializer, RequestUpdateSerializer, NopoF
 from outcomes.models import Outcome, OutcomeFile
 from main.serializers import OutcomeCardSerializer
 from accounts.models import Profile
-from .models import Request
-from .models import NopoFeedback
+from .models import Request, NopoFeedback
+from missions.models import Mission, MissionStep
 
 import io
 import os
@@ -81,6 +83,86 @@ def nopo_home(request):
         "my_recent_requests": recent,     # 최신 3개
     }
     return Response(data, status=status.HTTP_200_OK)
+
+
+# 요청탭
+@api_view(["GET"])
+def nopo_request(request):
+    profile = request.user.profile  # 로그인 전제
+
+    # 1) 기본정보 + 썸네일 + 상태 필터 / 최신순 정렬
+    status_q = (request.GET.get("status") or "").upper()
+    qs = Request.objects.filter(owner=profile)
+    if status_q in (Request.Status.OPEN, Request.Status.ONGOING, Request.Status.CLOSED):
+        qs = qs.filter(status=status_q)
+    qs = qs.only("id", "store_name", "title", "image", "status").order_by("-created_at")
+
+    today = timezone.now().date()
+    items = []
+
+    for obj in qs:
+        # 공통
+        url_attr = getattr(getattr(obj, "image", None), "url", None)
+        image_url = request.build_absolute_uri(url_attr) if url_attr else ""
+
+        item = {
+            "id": obj.id,
+            "store_name": obj.store_name,
+            "title": obj.title,
+            "image_url": image_url,
+            "status": obj.status,  
+        }
+
+        # 상태별 추가
+        if obj.status == Request.Status.OPEN:
+            item["links"] = {
+                "edit": reverse("nopo-request-edit", kwargs={"request_id": obj.id}),
+                "end":  reverse("nopo-request-end",  kwargs={"request_id": obj.id}),
+            }
+
+        elif obj.status == Request.Status.ONGOING:
+            # 해당 요청의 진행중 미션 1개 기준(일반 전제)
+            mission = (
+                Mission.objects
+                .filter(request=obj, status=Mission.Status.IN_PROGRESS)
+                .prefetch_related("steps")
+                .order_by("-created_at")
+                .first()
+            )
+
+            step_no = None
+            deadline_iso = None
+            dday = None
+
+            if mission:
+                if mission.deadline:
+                    deadline_date = mission.deadline.date()
+                    deadline_iso = mission.deadline.isoformat()
+                    dday = (deadline_date - today).days
+
+                # TODO_or_DOING 중 가장 낮은 step_no, 없으면 마지막 step_no
+                steps = sorted(mission.steps.all(), key=lambda s: s.step_no)
+                current = next(
+                    (s for s in steps if s.status in (MissionStep.StepStatus.TODO, MissionStep.StepStatus.DOING)),
+                    None
+                )
+                step_no = current.step_no if current else (steps[-1].step_no if steps else None)
+
+            item["progress"] = {
+                "step_no": step_no,
+                "deadline": deadline_iso,
+                "dday": dday,
+            }
+
+        items.append(item)
+
+    return Response(
+        {
+            "links": {"request_create": reverse("nopo-request-create")},  # /nopo/request/create
+            "items": items,
+        },
+        status=status.HTTP_200_OK,
+    )
 
 
 # 요청입력
@@ -173,6 +255,7 @@ def nopo_request_end(request, request_id: int):
 
     return Response({"id": req.id, "status": req.status, "message": "요청이 종료/중단 처리되었습니다."}, status=status.HTTP_200_OK)
 
+
 # 상인 마이페이지
 @api_view(["GET"])
 def nopo_received(request):
@@ -198,6 +281,7 @@ def nopo_received(request):
         "outcomes": OutcomeCardSerializer(outcomes_qs, many=True, context={"request": request}).data,
     }
     return Response(data, status=status.HTTP_200_OK)
+
 
 # 후기작성 (피드백)
 @api_view(["POST"])
@@ -225,6 +309,7 @@ def nopo_received_feedback(request):
     obj = ser.save(author=author)  # 생성만
 
     return Response(NopoFeedbackSerializer(obj).data, status=status.HTTP_201_CREATED)
+
 
 # 청년의 결과물 (outcome) 다운로드 
 @api_view(["GET"])
