@@ -161,11 +161,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 from pathlib import Path
 import os
 
-STATIC_URL = 'static/'
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+STATIC_URL = '/static/'
+
+# 개발환경에서는 STATICFILES_DIRS 사용
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+# 배포환경에서 collectstatic 모으는 경로
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True

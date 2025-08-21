@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Request
+from .models import NopoFeedback
+from main.serializers import OutcomeCardSerializer
 
 class RequestCreateSerializer(serializers.ModelSerializer):
     # 필수로 입력해야 하는 항목
@@ -47,3 +49,24 @@ class RequestUpdateSerializer(serializers.ModelSerializer):
         if len(value) > 16:
             raise serializers.ValidationError("제목은 16자 이내로 작성해주세요.")
         return value
+    
+class NopoReceivedSerializer(serializers.Serializer):
+    ongoing_count = serializers.IntegerField()
+    outcomes = OutcomeCardSerializer(many=True)
+
+class NopoFeedbackSerializer(serializers.ModelSerializer):
+    comment = serializers.CharField(required=True, allow_blank=False)
+    
+    class Meta:
+        model = NopoFeedback
+        fields = [
+            "id",
+            "outcome",
+            "overall_satisfaction",
+            "reflection_level",
+            "practical_use",
+            "comment",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "created_at", "updated_at"]

@@ -1,5 +1,9 @@
 from django.urls import reverse
 from django.shortcuts import get_object_or_404
+from django.http import FileResponse
+from django.utils import timezone
+from django.db.models import Max
+
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser
@@ -7,9 +11,16 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
 
-from .models import Request
-from .serializers import RequestCreateSerializer, RequestUpdateSerializer
+from .serializers import RequestCreateSerializer, RequestUpdateSerializer, NopoFeedbackSerializer
+from outcomes.models import Outcome, OutcomeFile
+from main.serializers import OutcomeCardSerializer
 from accounts.models import Profile
+from .models import Request, NopoFeedback
+from missions.models import Mission, MissionStep
+
+import io
+import os
+import zipfile
 
 
 # 상인 홈: 요청작성 링크 + 진행현황 집계 + 최근 요청글 3개 요청
@@ -74,7 +85,87 @@ def nopo_home(request):
     return Response(data, status=status.HTTP_200_OK)
 
 
-# ✅ 요청입력
+# 요청탭
+@api_view(["GET"])
+def nopo_request(request):
+    profile = request.user.profile  # 로그인 전제
+
+    # 1) 기본정보 + 썸네일 + 상태 필터 / 최신순 정렬
+    status_q = (request.GET.get("status") or "").upper()
+    qs = Request.objects.filter(owner=profile)
+    if status_q in (Request.Status.OPEN, Request.Status.ONGOING, Request.Status.CLOSED):
+        qs = qs.filter(status=status_q)
+    qs = qs.only("id", "store_name", "title", "image", "status").order_by("-created_at")
+
+    today = timezone.now().date()
+    items = []
+
+    for obj in qs:
+        # 공통
+        url_attr = getattr(getattr(obj, "image", None), "url", None)
+        image_url = request.build_absolute_uri(url_attr) if url_attr else ""
+
+        item = {
+            "id": obj.id,
+            "store_name": obj.store_name,
+            "title": obj.title,
+            "image_url": image_url,
+            "status": obj.status,  
+        }
+
+        # 상태별 추가
+        if obj.status == Request.Status.OPEN:
+            item["links"] = {
+                "edit": reverse("nopo-request-edit", kwargs={"request_id": obj.id}),
+                "end":  reverse("nopo-request-end",  kwargs={"request_id": obj.id}),
+            }
+
+        elif obj.status == Request.Status.ONGOING:
+            # 해당 요청의 진행중 미션 1개 기준(일반 전제)
+            mission = (
+                Mission.objects
+                .filter(request=obj, status=Mission.Status.IN_PROGRESS)
+                .prefetch_related("steps")
+                .order_by("-created_at")
+                .first()
+            )
+
+            step_no = None
+            deadline_iso = None
+            dday = None
+
+            if mission:
+                if mission.deadline:
+                    deadline_date = mission.deadline.date()
+                    deadline_iso = mission.deadline.isoformat()
+                    dday = (deadline_date - today).days
+
+                # TODO_or_DOING 중 가장 낮은 step_no, 없으면 마지막 step_no
+                steps = sorted(mission.steps.all(), key=lambda s: s.step_no)
+                current = next(
+                    (s for s in steps if s.status in (MissionStep.StepStatus.TODO, MissionStep.StepStatus.DOING)),
+                    None
+                )
+                step_no = current.step_no if current else (steps[-1].step_no if steps else None)
+
+            item["progress"] = {
+                "step_no": step_no,
+                "deadline": deadline_iso,
+                "dday": dday,
+            }
+
+        items.append(item)
+
+    return Response(
+        {
+            "links": {"request_create": reverse("nopo-request-create")},  # /nopo/request/create
+            "items": items,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+# 요청입력
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser])
@@ -107,7 +198,7 @@ def nopo_request_create(request):
     )
 
 
-# ✅ 요청수정
+# 요청수정
 @api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser])   # 이미지 교체 허용
@@ -142,7 +233,7 @@ def nopo_request_edit(request, request_id: int):
     }, status=status.HTTP_200_OK)
 
 
-# ✅ 요청종료
+# 요청종료
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def nopo_request_end(request, request_id: int):
@@ -163,3 +254,111 @@ def nopo_request_end(request, request_id: int):
     req.save(update_fields=["status", "updated_at"])
 
     return Response({"id": req.id, "status": req.status, "message": "요청이 종료/중단 처리되었습니다."}, status=status.HTTP_200_OK)
+
+
+# 상인 마이페이지
+@api_view(["GET"])
+def nopo_received(request):
+    profile = request.user.profile  
+
+    # 진행중 요청 개수
+    ongoing_count = Request.objects.filter(
+        status=Request.Status.ONGOING,
+        owner=profile
+    ).count()
+
+    # Outcome 목록 (상인 요청에 제출된 것들)
+    outcomes_qs = (
+        Outcome.objects
+        .select_related("mission__request")
+        .filter(mission__request__owner=profile)
+        .order_by("-created_at")
+    )
+
+    # 직렬화
+    data = {
+        "ongoing_count": ongoing_count,
+        "outcomes": OutcomeCardSerializer(outcomes_qs, many=True, context={"request": request}).data,
+    }
+    return Response(data, status=status.HTTP_200_OK)
+
+
+# 후기작성 (피드백)
+@api_view(["POST"])
+def nopo_received_feedback(request):
+
+    author = request.user.profile          
+    outcome_id = request.data.get("outcome_id")
+    if not outcome_id:
+        return Response({"detail": "outcome_id가 필요합니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # 이미 제출했는지(한 번만 가능)
+    if NopoFeedback.objects.filter(outcome_id=outcome_id, author=author).exists():
+        return Response({"detail": "이미 피드백을 제출했습니다."}, status=status.HTTP_409_CONFLICT)
+
+    payload = {
+        "outcome": outcome_id,
+        "overall_satisfaction": request.data.get("overall_satisfaction"),
+        "reflection_level": request.data.get("reflection_level"),
+        "practical_use": request.data.get("practical_use"),
+        "comment": request.data.get("comment"),
+    }
+
+    ser = NopoFeedbackSerializer(data=payload)
+    ser.is_valid(raise_exception=True)
+    obj = ser.save(author=author)  # 생성만
+
+    return Response(NopoFeedbackSerializer(obj).data, status=status.HTTP_201_CREATED)
+
+
+# 청년의 결과물 (outcome) 다운로드 
+@api_view(["GET"])
+def nopo_received_download(request, outcome_id: int):
+    outcome = Outcome.objects.get(pk=outcome_id)  # 존재 전제
+
+    images = list(
+        OutcomeFile.objects.filter(
+            outcome=outcome, kind=OutcomeFile.Kind.IMAGE
+        ).order_by("order", "id")
+    )
+
+    if images:
+        if len(images) == 1:
+            f = images[0]
+            fp = open(f.file.path, "rb")
+            resp = FileResponse(fp)
+            resp["Content-Disposition"] = f'attachment; filename="{os.path.basename(f.file.name)}"'
+            return resp
+
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+            for f in images:
+                zf.write(f.file.path, arcname=os.path.basename(f.file.name))
+        buf.seek(0)
+        resp = FileResponse(buf, content_type="application/zip")
+        resp["Content-Disposition"] = f'attachment; filename="outcome_{outcome.id}_images.zip"'
+        return resp
+
+    # 텍스트 판별: mime_type startswith("text/") 또는 파일명 .txt
+    texts = list(
+        OutcomeFile.objects.filter(outcome=outcome).exclude(kind=OutcomeFile.Kind.IMAGE).order_by("order", "id")
+    )
+    texts = [f for f in texts if (getattr(f, "mime_type", "") or "").startswith("text/") or f.file.name.lower().endswith(".txt")]
+
+    if len(texts) == 1:
+        f = texts[0]
+        fp = open(f.file.path, "rb")
+        resp = FileResponse(fp, content_type="text/plain")
+        resp["Content-Disposition"] = f'attachment; filename="outcome_{outcome.id}.txt"'
+        return resp
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        for idx, f in enumerate(texts, start=1):
+            # ZIP 안에서는 모두 .txt로 강제
+            arcname = f"text_{idx}.txt"
+            zf.write(f.file.path, arcname=arcname)
+    buf.seek(0)
+    resp = FileResponse(buf, content_type="application/zip")
+    resp["Content-Disposition"] = f'attachment; filename="outcome_{outcome.id}_texts.zip"'
+    return resp
