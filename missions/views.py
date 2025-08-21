@@ -69,7 +69,6 @@ def mission_detail(request, id):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
 def save_mission(request):
     req_id = request.data.get("request_id")
     if not req_id:
@@ -115,7 +114,6 @@ def _parse_deadline_to_dt(deadline_str: str):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])  # 인증이 필요 없다면 제거
 def generate_plan(request):
     """
     POST /youth/plan
@@ -176,7 +174,7 @@ def generate_plan(request):
             youth=youth,
             deadline=deadline_dt,
             status=Mission.Status.IN_PROGRESS,
-            ai_model="gpt-4o-mini",
+            ai_model="gpt-3.5-turbo",
             ai_plan_ver=next_ver,
             plan=plan_json,  # 원본 JSON 보관
         )
