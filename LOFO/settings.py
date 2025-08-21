@@ -53,10 +53,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
 
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 
     'django.middleware.csrf.CsrfViewMiddleware',  # DRF 쪽에선 아래 커스텀 인증이 CSRF를 무력화함
@@ -178,7 +178,21 @@ CORS_ALLOWED_ORIGINS = [
     "https://2025-hackathon-3-lofo.netlify.app",
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+    "https://2025-hackathon-3-lofo.netlify.app",
+]
+
 from dotenv import load_dotenv
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# 보안/쿠키
+SESSION_COOKIE_SECURE = True                 # HTTPS 필수
+SESSION_COOKIE_SAMESITE = "None"             # 교차 도메인 세션 허용
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "None"

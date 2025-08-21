@@ -148,7 +148,7 @@ def build_plan(
 
     # 1차 호출 (JSON 강제)
     resp = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": system},
             {"role": "user", "content": user},
@@ -169,7 +169,7 @@ def build_plan(
     except Exception:
         # 2차 시도(더 엄격)
         resp2 = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system},
                 {"role": "user", "content": user + "\n반드시 위 JSON 스키마를 정확히 따르고, reference는 문자열 목록(list)로만 출력."},
@@ -242,7 +242,7 @@ def build_step_feedback(
         content.append({"type": "text", "text": f"[파일 내용 발췌]\n{snippet}"})
 
     resp = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": system},
             {"role": "user", "content": content},
