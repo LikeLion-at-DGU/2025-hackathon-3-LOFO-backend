@@ -1,5 +1,5 @@
 # outcomes/views.py
-from django.db.models import Prefetch, Count, Exists, OuterRef
+from django.db.models import Prefetch, Count, Exists, OuterRef, Case, When, BooleanField
 from django.http import FileResponse, HttpResponseRedirect, Http404
 from django.conf import settings
 from django.shortcuts import redirect
@@ -18,6 +18,7 @@ from main.serializers import OutcomeCardSerializer
 import io
 import os
 
+# 청년 마이페이지 (포트폴리오로 연결됨)
 @api_view(["GET"])
 def youth_mypage_redirect(request):
     return redirect("outcomes:youth-portfolio") 
@@ -52,59 +53,20 @@ def youth_portfolio(request):
         .annotate(is_liked=Exists(Like.objects.filter(outcome=OuterRef("pk"), user=profile)))
     )
 
+    # NopoPick 뱃지 할당 조건
+    qs = qs.annotate(
+        nopo_pick=Case(
+            When(like_count__gte=10, then=True),
+            default=False,
+            output_field=BooleanField(),
+        )
+    )
+
     for o in qs:
         o._prefetched_cover_files = list(o.files.all()[:1])
 
     ser = OutcomeCardSerializer(qs, many=True, context={"request": request})
     return Response(ser.data, status=status.HTTP_200_OK)
-
-
-#동영상 처리.. 추후 코드 수정 필요
-@api_view(["GET"])
-def video_thumb(request, file_id: int):
-
-    # 영상(OutcomeFile.kind=VIDEO)의 첫 프레임을 JPEG로 반환.
-    # moviepy / opencv 없거나 실패하면 정적 대체이미지로 리다이렉트.
-    try:
-        of = OutcomeFile.objects.get(pk=file_id, kind=OutcomeFile.Kind.VIDEO)
-    except OutcomeFile.DoesNotExist:
-        raise Http404("영상 파일을 찾을 수 없습니다.")
-
-    # 1) moviepy 시도
-    try:
-        from moviepy.editor import VideoFileClip
-        from PIL import Image
-        clip = VideoFileClip(of.file.path)
-        frame = clip.get_frame(0.1)  # 0.1s
-        clip.close()
-        buf = io.BytesIO()
-        Image.fromarray(frame).save(buf, format="JPEG", quality=85)
-        buf.seek(0)
-        return FileResponse(buf, content_type="image/jpeg")
-    except Exception:
-        pass
-
-    # 2) opencv 시도
-    try:
-        import cv2
-        from PIL import Image
-        cap = cv2.VideoCapture(of.file.path)
-        cap.set(cv2.CAP_PROP_POS_MSEC, 100)
-        success, image = cap.read()
-        cap.release()
-        if success:
-            import numpy as np
-            img = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-            buf = io.BytesIO()
-            img.save(buf, format="JPEG", quality=85)
-            buf.seek(0)
-            return FileResponse(buf, content_type="image/jpeg")
-    except Exception:
-        pass
-
-    # 3) 실패 → 고정 썸네일
-    fallback = getattr(settings, "OUTCOME_VIDEO_FALLBACK_THUMB_STATIC", "static/images/video-thumb-fallback.png")
-    return HttpResponseRedirect(fallback)
 
 # 청년 마이페이지 > 성장지표 > 피드백
 @api_view(["GET"])
@@ -114,7 +76,13 @@ def youth_insights(request):
     # 미션 통계
     done_cnt = Mission.objects.filter(youth=profile, status=Mission.Status.DONE).count()
     ing_cnt = Mission.objects.filter(youth=profile, status=Mission.Status.IN_PROGRESS).count()
-    nopo_pick_cnt = Outcome.objects.filter(youth=profile, nopo_pick=True).count()
+    nopo_pick_cnt = (
+        Outcome.objects
+        .filter(youth=profile)
+        .annotate(like_count=Count("likes", distinct=True))
+        .filter(like_count__gte=10)
+        .count()
+    )
     total_cnt = done_cnt + ing_cnt
 
     # 8~9. 내가 받은 모든 피드백 목록 (가게이름 | 코멘트 44자 요약)
@@ -145,7 +113,7 @@ def youth_insights(request):
     cover_qs = OutcomeFile.objects.order_by("order", "id")
     pick_qs = (
         Outcome.objects
-        .filter(youth=profile, nopo_pick=True)
+        .filter(youth=profile)
         .select_related("mission__request")
         .prefetch_related(Prefetch("files", queryset=cover_qs))
         .only(
@@ -157,6 +125,14 @@ def youth_insights(request):
         )
         .order_by("-created_at")
         .annotate(like_count=Count("likes", distinct=True))
+        .filter(like_count__gte=10) 
+        .annotate(
+            nopo_pick=Case(  # [NopoPick] 카드 뱃지 표시에 쓰일 값 동기화
+                When(like_count__gte=10, then=True),
+                default=False,
+                output_field=BooleanField(),
+            )
+        ) 
         .annotate(is_liked=Exists(Like.objects.filter(outcome=OuterRef("pk"), user=profile)))
     )
     for o in pick_qs:
