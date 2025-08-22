@@ -1,7 +1,9 @@
-from rest_framework import serializers
 from django.conf import settings
-from outcomes.models import Outcome, OutcomeFile
 from django.urls import reverse
+from rest_framework import serializers
+from outcomes.models import Outcome, OutcomeFile
+from typing import Optional
+import io
 
 class OutcomeCardSerializer(serializers.ModelSerializer):
     cover_image_url = serializers.SerializerMethodField()
@@ -28,41 +30,55 @@ class OutcomeCardSerializer(serializers.ModelSerializer):
         ]
 
     def get_cover_image_url(self, obj: Outcome):
-        """
-        대표 썸네일 우선순위
-        1) IMAGE → 원본 이미지
-        2) VIDEO → /outcomes/files/<id>/video-thumb
-        3) PDF   → 고정 아이콘 이미지
-        """
         request = self.context.get("request")
 
-        # ① 뷰에서 미리 슬라이스해서 넣어준 경우(권장)
-        f = next(iter(getattr(obj, "_prefetched_cover_files", [])), None)
+        # 뷰에서 미리 넣어준 프리패치가 있으면 그 안에서 우선 탐색
+        prefetched = list(getattr(obj, "_prefetched_cover_files", [])) or []
 
-        # ② 없으면 직접 조회 (order, id 오름차순)
-        if not f:
-            f = obj.files.order_by("order", "id").first()
-        if not f:
+        def first_by_kind(files, kind):
+            for f in files:
+                if getattr(f, "kind", None) == kind:
+                    return f
             return None
 
-        # IMAGE → 그대로
-        if f.kind == OutcomeFile.Kind.IMAGE:
+        # 프리패치에서 우선 탐색
+        f_img = first_by_kind(prefetched, OutcomeFile.Kind.IMAGE)
+        f_txt = first_by_kind(prefetched, OutcomeFile.Kind.TXT) if not f_img else None
+
+        # DB 조회 (order, id 오름차순)
+        if not f_img:
+            f_img = (
+                obj.files.filter(kind=OutcomeFile.Kind.IMAGE)
+                .order_by("order", "id")
+                .first()
+            )
+        if not f_img and not f_txt:
+            f_txt = (
+                obj.files.filter(kind=OutcomeFile.Kind.TXT)
+                .order_by("order", "id")
+                .first()
+            )
+
+        # 1) IMAGE → 절대 URL
+        if f_img and getattr(f_img, "file", None) and getattr(f_img.file, "url", None):
+            url = f_img.file.url
+            return request.build_absolute_uri(url) if request else url
+
+        # 2) TXT → 전체 본문 반환 (utf-8 → cp949 → latin-1 순서 시도, 실패 시 치환)
+        if f_txt and getattr(f_txt, "file", None):
+            f_txt.file.open("rb")
             try:
-                url = f.file.url
-                return request.build_absolute_uri(url) if request else url
-            except Exception:
-                return None
+                raw = f_txt.file.read()
+                for enc in ("utf-8", "cp949", "latin-1"):
+                    try:
+                        return raw.decode(enc)
+                    except UnicodeDecodeError:
+                        continue
+                return raw.decode("utf-8", errors="replace")  # 최종 fallback
+            finally:
+                f_txt.file.close()
 
-        # VIDEO → 썸네일 엔드포인트
-        if f.kind == OutcomeFile.Kind.VIDEO:
-            thumb_url = reverse("outcomes:video-thumb", args=[f.id])
-            return request.build_absolute_uri(thumb_url) if request else thumb_url
-
-        # PDF → 고정 아이콘
-        if f.kind == OutcomeFile.Kind.PDF:
-            static_path = getattr(settings, "OUTCOME_PDF_THUMB_STATIC", "static/images/pdf-thumb.png")
-            return request.build_absolute_uri(static_path) if request else static_path
-
+        # 3) 없음
         return None
 
     def get_title(self, obj: Outcome):
