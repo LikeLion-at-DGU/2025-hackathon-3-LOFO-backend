@@ -12,7 +12,6 @@ class TimeStampedModel(models.Model):
 class Mission(TimeStampedModel):
      class Status(models.TextChoices):
           IN_PROGRESS = "IN_PROGRESS", "진행중"
-          DISCARD = "DISCARD", "포기"
           EXPIRE = "EXPIRE", "기한만료"
           DONE = "DONE", "완료"
      request = models.ForeignKey("inquiries.Request", on_delete=models.PROTECT, related_name="missions", db_index=True,)
@@ -32,7 +31,7 @@ class Mission(TimeStampedModel):
 class MissionStep(TimeStampedModel):
      class StepStatus(models.TextChoices):
           TODO    = "TODO", "대기"
-          DOING   = "DOING", "진행중"
+          IN_PROGRESS   = "IN_PROGRESS", "진행중"
           DONE    = "DONE", "완료"
           EXPIRED = "EXPIRED", "기한만료"
 
@@ -43,7 +42,7 @@ class MissionStep(TimeStampedModel):
      reference = models.TextField()
      due = models.DateField(null=True, blank=True)
 
-     status = models.CharField(max_length=10, choices=StepStatus.choices, default=StepStatus.TODO, db_index=True)
+     status = models.CharField(max_length=15, choices=StepStatus.choices, default=StepStatus.TODO, db_index=True)
      completed_at = models.DateTimeField(null=True, blank=True)
      # 파일 저장 안하고 피드백 요청만 카운트
      feedback_count = models.PositiveIntegerField(default=0)
