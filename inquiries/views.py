@@ -2,9 +2,9 @@ from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 from django.utils import timezone
-from django.db.models import Max, Prefetch, Count, Exists, OuterRef, Case, When, BooleanField
+from django.db.models import Prefetch
 
-from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
@@ -15,7 +15,7 @@ from .serializers import RequestCreateSerializer, RequestUpdateSerializer, NopoF
 from outcomes.models import Outcome, OutcomeFile
 from main.serializers import OutcomeCardSerializer
 from accounts.models import Profile
-from .models import Request, NopoFeedback
+from .models import Request, NopoFeedback, Saved
 from missions.models import Mission, MissionStep
 
 import io
@@ -459,3 +459,26 @@ def nopo_received_download(request, outcome_id: int):
     resp = FileResponse(buf, content_type="application/zip")
     resp["Content-Disposition"] = f'attachment; filename="outcome_{outcome.id}_files.zip"'
     return resp
+
+# 찜하기 토글
+@api_view(["POST"])
+def saved_toggle(request, id: int):
+    try:
+        req = Request.objects.get(pk=id)
+    except Request.DoesNotExist:
+        return Response({"detail": "존재하지 않는 요청글입니다."}, status=status.HTTP_404_NOT_FOUND)
+
+    profile = getattr(request.user, "profile", None)
+    if not profile:
+        return Response({"detail": "프로필이 필요합니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+    saved, created = Saved.objects.get_or_create(user=profile, request=req)
+    if not created:
+        saved.delete()
+        is_saved = False
+    else:
+        is_saved = True
+
+    saved_count = Saved.objects.filter(request=req).count()
+
+    return Response({"saved": is_saved, "saved_count": saved_count}, status=status.HTTP_200_OK)
