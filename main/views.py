@@ -7,7 +7,7 @@ from outcomes.models import Outcome, OutcomeFile
 from .models import Like
 from .serializers import OutcomeCardSerializer
 
-
+# 발견탭 (커뮤니티)
 @api_view(["GET"])
 def comunity(request):  # outcome list
     category = request.GET.get("category")
@@ -62,7 +62,7 @@ def comunity(request):  # outcome list
     ser = OutcomeCardSerializer(qs, many=True, context={"request": request})
     return Response(ser.data, status=status.HTTP_200_OK)
 
-
+# 좋아요
 @api_view(["POST"])
 def like_toggle(request, id: int):
     try:

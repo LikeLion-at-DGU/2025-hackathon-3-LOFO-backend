@@ -25,7 +25,6 @@ class Request(TimeStampedModel):
           CLOSED = "CLOSED", "종료/중단"
 
      class Category(models.TextChoices):
-          PROMO_VIDEO = "PROMO_VIDEO", "홍보영상"
           POSTER_FLYER = "POSTER_FLYER", "포스터·전단"
           SNS_IMAGE = "SNS_IMAGE", "SNS 이미지"
           INTERIOR_PROPOSAL = "INTERIOR_PROPOSAL", "인테리어 제안"

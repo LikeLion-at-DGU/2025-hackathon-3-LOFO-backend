@@ -11,5 +11,6 @@ urlpatterns = [
 
     path("received", views.nopo_received, name="nopo-received"), #상인 마이페이지
     path("received/feedback", views.nopo_received_feedback, name="nopo-received-feedback"),
+    path("received/<int:outcome_id>/form-data", views.nopo_feedback_form_data, name="nopo-feedback-form-data"),
     path("received/<int:outcome_id>/download", views.nopo_received_download, name="nopo-received-download"),
 ]

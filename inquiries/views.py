@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 from django.utils import timezone
-from django.db.models import Max
+from django.db.models import Max, Prefetch, Count, Exists, OuterRef, Case, When, BooleanField
 
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated
@@ -25,7 +25,6 @@ import zipfile
 
 # 상인 홈: 요청작성 링크 + 진행현황 집계 + 최근 요청글 3개 요청
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
 def nopo_home(request):
     profile = getattr(request.user, "profile", None)
     if profile is None:
@@ -59,8 +58,8 @@ def nopo_home(request):
             "id": obj.id,
             "store_name": obj.store_name,
             "title": obj.title,
-            "category": obj.category,                    # ex) "PROMO_VIDEO"
-            "category_label": obj.get_category_display(),# ex) "홍보영상"
+            "category": obj.category,                    # ex) "POSTER_FLYER"
+            "category_label": obj.get_category_display(),# ex) "포스터·전단"
             "status": obj.status,                        # ex) "OPEN"
             "status_label": obj.get_status_display(),    # ex) "모집중"
             "image_url": image_url,
@@ -167,7 +166,6 @@ def nopo_request(request):
 
 # 요청입력
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser])
 def nopo_request_create(request):
     profile = getattr(request.user, "profile", None)
@@ -200,7 +198,6 @@ def nopo_request_create(request):
 
 # 요청수정
 @api_view(["PATCH"])
-@permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser])   # 이미지 교체 허용
 def nopo_request_edit(request, request_id: int):
     profile = getattr(request.user, "profile", None)
@@ -235,7 +232,6 @@ def nopo_request_edit(request, request_id: int):
 
 # 요청종료
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
 def nopo_request_end(request, request_id: int):
     profile = getattr(request.user, "profile", None)
     if profile is None:
@@ -267,13 +263,26 @@ def nopo_received(request):
         owner=profile
     ).count()
 
+    # 커버 후보만 prefetch
+    cover_qs = OutcomeFile.objects.filter(
+        kind__in=[OutcomeFile.Kind.IMAGE, OutcomeFile.Kind.TXT]
+    ).order_by("order", "id")
+
     # Outcome 목록 (상인 요청에 제출된 것들)
     outcomes_qs = (
         Outcome.objects
         .select_related("mission__request")
+        .prefetch_related(Prefetch("files", queryset=cover_qs))
         .filter(mission__request__owner=profile)
         .order_by("-created_at")
     )
+
+    # Serializer가 사용할 1개 후보만 심어주기: 이미지 우선 → 없으면 TXT
+    for o in outcomes_qs:
+        files = list(o.files.all())
+        img = next((f for f in files if f.kind == OutcomeFile.Kind.IMAGE), None)
+        txt = next((f for f in files if f.kind == OutcomeFile.Kind.TXT), None) if not img else None
+        o._prefetched_cover_files = [img or txt] if (img or txt) else []
 
     # 직렬화
     data = {
@@ -281,6 +290,85 @@ def nopo_received(request):
         "outcomes": OutcomeCardSerializer(outcomes_qs, many=True, context={"request": request}).data,
     }
     return Response(data, status=status.HTTP_200_OK)
+
+
+# 후기작성 (피드백) 폼 리소스
+@api_view(["GET"])
+def nopo_feedback_form_data(request, outcome_id: int):
+    profile = request.user.profile
+
+    # 권한 확인: 이 상인이 소유한 요청의 outcome만 접근 가능
+    outcome = (
+        Outcome.objects
+        .select_related("mission__request")
+        .filter(pk=outcome_id, mission__request__owner=profile)
+        .first()
+    )
+    if not outcome:
+        return Response({"detail": "접근 권한이 없거나 존재하지 않는 결과물입니다."}, status=status.HTTP_404_NOT_FOUND)
+
+    # 이미 제출했는지(한 번만 가능)
+    if NopoFeedback.objects.filter(outcome_id=outcome_id, author=profile).exists():
+        return Response({"detail": "이미 피드백을 제출했습니다."}, status=status.HTTP_409_CONFLICT)
+
+    # 1) 이미지 수집 (있으면 이미지만 반환)
+    images = (
+        OutcomeFile.objects
+        .filter(outcome=outcome, kind=getattr(OutcomeFile.Kind, "IMAGE", None))
+        .order_by("order", "id")
+    )
+    image_urls = [
+        request.build_absolute_uri(f.file.url)
+        for f in images
+        if getattr(getattr(f, "file", None), "url", None)
+    ]
+    if image_urls:
+        return Response({
+            "outcome_id": outcome.id,
+            "images": image_urls,  # 1개거나 N개
+            "texts": []            # 이미지가 있으면 텍스트는 비움
+        }, status=status.HTTP_200_OK)
+
+    # 2) TXT 수집 (utf-8 → cp949 → latin-1 순서 시도, 실패 시 치환)
+    def _read_text_all(file_field) -> str:
+        file_field.open("rb")
+        try:
+            raw = file_field.read()
+            for enc in ("utf-8", "cp949", "latin-1"):
+                try:
+                    return raw.decode(enc)
+                except UnicodeDecodeError:
+                    continue
+            return raw.decode("utf-8", errors="replace")  # 최종 fallback
+        finally:
+            file_field.close()
+
+    # Kind.TXT가 없더라도 MIME/확장자로 텍스트 판별
+    non_images = (
+        OutcomeFile.objects
+        .filter(outcome=outcome)
+        .exclude(kind=getattr(OutcomeFile.Kind, "IMAGE", None))
+        .order_by("order", "id")
+    )
+    texts = []
+    for f in non_images:
+        mime = (getattr(f, "mime_type", "") or "").lower()
+        name = (getattr(getattr(f, "file", None), "name", "") or "").lower()
+        if mime.startswith("text/") or name.endswith(".txt"):
+            try:
+                texts.append(_read_text_all(f.file))
+            except Exception:
+                texts.append("")
+
+    if texts:
+        return Response({
+            "outcome_id": outcome.id,
+            "images": [],    # 텍스트가 있으면 이미지는 비움
+            "texts": texts   # 한 개여도 리스트로
+        }, status=status.HTTP_200_OK)
+
+    # 3) 아무 파일도 없으면
+    return Response({"detail": "표시할 파일이 없습니다."}, status=status.HTTP_404_NOT_FOUND)
 
 
 # 후기작성 (피드백)
@@ -316,49 +404,58 @@ def nopo_received_feedback(request):
 def nopo_received_download(request, outcome_id: int):
     outcome = Outcome.objects.get(pk=outcome_id)  # 존재 전제
 
+    # 이미지 수집
     images = list(
         OutcomeFile.objects.filter(
             outcome=outcome, kind=OutcomeFile.Kind.IMAGE
         ).order_by("order", "id")
     )
 
-    if images:
-        if len(images) == 1:
+    # 텍스트 수집 (Kind.TXT 또는 text/* 혹은 .txt)
+    text_qs = OutcomeFile.objects.filter(outcome=outcome).exclude(kind=OutcomeFile.Kind.IMAGE).order_by("order", "id")
+    texts = [f for f in text_qs if f.kind == OutcomeFile.Kind.TXT
+            or (getattr(f, "mime_type", "") or "").startswith("text/")
+            or f.file.name.lower().endswith(".txt")]
+
+    total_cnt = len(images) + len(texts)
+    if total_cnt == 0:
+        return Response({"detail": "다운로드할 파일이 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+
+    # 단일 파일이면 바로 내려주기
+    if total_cnt == 1:
+        if images:
             f = images[0]
             fp = open(f.file.path, "rb")
             resp = FileResponse(fp)
             resp["Content-Disposition"] = f'attachment; filename="{os.path.basename(f.file.name)}"'
             return resp
+        else:
+            f = texts[0]
+            fp = open(f.file.path, "rb")
+            resp = FileResponse(fp, content_type="text/plain")
+            # 확장자 보정
+            name = os.path.basename(f.file.name)
+            if not name.lower().endswith(".txt"):
+                name = os.path.splitext(name)[0] + ".txt"
+            resp["Content-Disposition"] = f'attachment; filename="{name}"'
+            return resp
 
-        buf = io.BytesIO()
-        with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
-            for f in images:
-                zf.write(f.file.path, arcname=os.path.basename(f.file.name))
-        buf.seek(0)
-        resp = FileResponse(buf, content_type="application/zip")
-        resp["Content-Disposition"] = f'attachment; filename="outcome_{outcome.id}_images.zip"'
-        return resp
-
-    # 텍스트 판별: mime_type startswith("text/") 또는 파일명 .txt
-    texts = list(
-        OutcomeFile.objects.filter(outcome=outcome).exclude(kind=OutcomeFile.Kind.IMAGE).order_by("order", "id")
-    )
-    texts = [f for f in texts if (getattr(f, "mime_type", "") or "").startswith("text/") or f.file.name.lower().endswith(".txt")]
-
-    if len(texts) == 1:
-        f = texts[0]
-        fp = open(f.file.path, "rb")
-        resp = FileResponse(fp, content_type="text/plain")
-        resp["Content-Disposition"] = f'attachment; filename="outcome_{outcome.id}.txt"'
-        return resp
-
+    # 2개 이상이면 ZIP
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        # 이미지: 원본 파일명
+        for f in images:
+            zf.write(f.file.path, arcname=os.path.basename(f.file.name))
+        # 텍스트: .txt로 강제
         for idx, f in enumerate(texts, start=1):
-            # ZIP 안에서는 모두 .txt로 강제
-            arcname = f"text_{idx}.txt"
-            zf.write(f.file.path, arcname=arcname)
+            try:
+                # 원본을 읽어 디코딩/리인코딩까지 할 필요는 없음 — 바이너리 그대로
+                zf.write(f.file.path, arcname=f"text_{idx}.txt")
+            except Exception:
+                # 파일 접근 실패 시 빈 파일 넣기
+                zf.writestr(f"text_{idx}.txt", "")
+
     buf.seek(0)
     resp = FileResponse(buf, content_type="application/zip")
-    resp["Content-Disposition"] = f'attachment; filename="outcome_{outcome.id}_texts.zip"'
+    resp["Content-Disposition"] = f'attachment; filename="outcome_{outcome.id}_files.zip"'
     return resp
