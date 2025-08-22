@@ -142,7 +142,7 @@ def nopo_request(request):
                 # TODO_or_DOING 중 가장 낮은 step_no, 없으면 마지막 step_no
                 steps = sorted(mission.steps.all(), key=lambda s: s.step_no)
                 current = next(
-                    (s for s in steps if s.status in (MissionStep.StepStatus.TODO, MissionStep.StepStatus.DOING)),
+                    (s for s in steps if s.status in (MissionStep.StepStatus.TODO, MissionStep.StepStatus.IN_PROGRESS)),
                     None
                 )
                 step_no = current.step_no if current else (steps[-1].step_no if steps else None)
