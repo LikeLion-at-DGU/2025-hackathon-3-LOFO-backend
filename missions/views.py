@@ -115,116 +115,126 @@ def _parse_deadline_to_dt(deadline_str: str):
 
 @api_view(["POST"])
 def generate_plan(request):
-    """
-    POST /youth/plan
-    body: { "request_id": number, "goal": string, "deadline": "YYYY-MM-DD" }
-    성공 시: 미션 & 스텝 생성 + 생성된 데이터 반환
-    """
-    req_id = request.data.get("request_id")
-    goal = request.data.get("goal")
-    deadline_str = request.data.get("deadline")
+     """
+     POST /youth/plan
+     body: { "request_id": number, "goal": string, "deadline": "YYYY-MM-DD" }
+     성공 시: 미션 & 스텝 생성 + 생성된 데이터 반환
+     """
+     req_id = request.data.get("request_id")
+     goal = request.data.get("goal")
+     deadline_str = request.data.get("deadline")
 
-    if not req_id or not goal or not deadline_str:
-        return Response({"detail": "request_id, goal, deadline 필수"}, status=status.HTTP_400_BAD_REQUEST)
+     if not req_id or not goal or not deadline_str:
+          return Response({"detail": "request_id, goal, deadline 필수"}, status=status.HTTP_400_BAD_REQUEST)
 
-    # 요청 존재 확인
-    try:
-        req_obj = Request.objects.get(pk=req_id)
-    except Request.DoesNotExist:
-        return Response({"detail": "존재하지 않는 요청입니다."}, status=status.HTTP_404_NOT_FOUND)
+     # 요청 존재 확인
+     try:
+          req_obj = Request.objects.get(pk=req_id)
+     except Request.DoesNotExist:
+          return Response({"detail": "존재하지 않는 요청입니다."}, status=status.HTTP_404_NOT_FOUND)
 
-    # 로그인 사용자 프로필
-    try:
-        youth: Profile = request.user.profile
-    except Exception:
-        return Response({"detail": "프로필이 필요합니다."}, status=status.HTTP_403_FORBIDDEN)
+     # 로그인 사용자 프로필
+     try:
+          youth: Profile = request.user.profile
+     except Exception:
+          return Response({"detail": "프로필이 필요합니다."}, status=status.HTTP_403_FORBIDDEN)
+     
+     if Mission.objects.filter(youth=youth, status=Mission.Status.IN_PROGRESS).exists():
+          return Response(
+               {"detail": "이미 진행 중인 미션이 있습니다. 완료/포기/만료 후 새 계획을 만들 수 있어요."},
+               status=status.HTTP_409_CONFLICT
+          )
 
-    # 마감일 파싱 (USE_TZ 설정에 맞게 aware/naive 반환되는 헬퍼 사용)
-    deadline_dt = _parse_deadline_to_dt(deadline_str)
-    if not deadline_dt:
-        return Response({"detail": "deadline 형식이 올바르지 않습니다."}, status=status.HTTP_400_BAD_REQUEST)
+     # 마감일 파싱 (USE_TZ 설정에 맞게 aware/naive 반환되는 헬퍼 사용)
+     deadline_dt = _parse_deadline_to_dt(deadline_str)
+     if not deadline_dt:
+          return Response({"detail": "deadline 형식이 올바르지 않습니다."}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Request의 제목/내용을 안전하게 가져와서 AI에 전달
-    req_title = getattr(req_obj, "title", None) or getattr(req_obj, "name", None) or ""
-    req_desc  = getattr(req_obj, "content", None) or getattr(req_obj, "description", None) or ""
+     # Request의 제목/내용을 안전하게 가져와서 AI에 전달
+     req_title = getattr(req_obj, "title", None) or getattr(req_obj, "name", None) or ""
+     req_desc  = getattr(req_obj, "content", None) or getattr(req_obj, "description", None) or ""
 
-    # AI로 플랜 생성 (JSON steps 3개)
-    try:
-        safe_deadline_str = str(deadline_str).replace(".", "-").replace("/", "-")
-        plan_json = build_plan(
-            goal=goal,
-            deadline_date_str=safe_deadline_str,
-            request_title=req_title,
-            request_desc=req_desc,
-        )
-    except Exception as e:
-        return Response({"detail": f"AI 계획 생성 실패: {e}"}, status=status.HTTP_502_BAD_GATEWAY)
+     # AI로 플랜 생성 (JSON steps 3개)
+     try:
+          safe_deadline_str = str(deadline_str).replace(".", "-").replace("/", "-")
+          plan_json = build_plan(
+               goal=goal,
+               deadline_date_str=safe_deadline_str,
+               request_title=req_title,
+               request_desc=req_desc,
+          )
+     except Exception as e:
+          return Response({"detail": f"AI 계획 생성 실패: {e}"}, status=status.HTTP_502_BAD_GATEWAY)
 
-    steps = plan_json.get("steps", [])
-    if not isinstance(steps, list) or len(steps) != 3:
-        return Response({"detail": "AI가 3단계 계획을 반환하지 않았습니다."}, status=status.HTTP_502_BAD_GATEWAY)
+     steps = plan_json.get("steps", [])
+     if not isinstance(steps, list) or len(steps) != 3:
+          return Response({"detail": "AI가 3단계 계획을 반환하지 않았습니다."}, status=status.HTTP_502_BAD_GATEWAY)
 
-    # DB 저장 (원자적)
-    with transaction.atomic():
-        # 같은 Request에 여러 Mission 허용: 버전 자동 증가
-        next_ver = Mission.objects.filter(request=req_obj).count() + 1
+     # DB 저장 (원자적)
+     with transaction.atomic():
+          # 같은 Request에 여러 Mission 허용: 버전 자동 증가
+          next_ver = Mission.objects.filter(request=req_obj).count() + 1
 
-        mission = Mission.objects.create(
-            request=req_obj,
-            youth=youth,
-            deadline=deadline_dt,
-            status=Mission.Status.IN_PROGRESS,
-            ai_model="gpt-3.5-turbo",
-            ai_plan_ver=next_ver,
-            plan=plan_json,  # 원본 JSON 보관
-        )
+          # Request 상태를 ONGOING 으로 업데이트
+          req_obj.status = Request.Status.IN_PROGRESS
+          req_obj.save(update_fields=["status"])
 
-        # 스텝 생성 (1~3 고정) + reference(list[str])를 TextField로 저장 가능한 문자열로 변환
-        step_objs = []
-        for idx, s in enumerate(steps, start=1):
-            due_str = s.get("due")  # "YYYY-MM-DD" or None
-            due_date = None
-            if due_str:
-                s2 = str(due_str).replace(".", "-").replace("/", "-")
-                due_date = parse_date(s2)
+          mission = Mission.objects.create(
+               request=req_obj,
+               youth=youth,
+               deadline=deadline_dt,
+               status=Mission.Status.IN_PROGRESS,
+               ai_model="gpt-3.5-turbo",
+               ai_plan_ver=next_ver,
+               plan=plan_json,  # 원본 JSON 보관
+          )
 
-            ref_val = s.get("reference") or []
-            if isinstance(ref_val, list):
-                reference_text = "- " + "\n- ".join([str(x).strip() for x in ref_val if str(x).strip()])
-            else:
-                reference_text = str(ref_val).strip()
+          # 스텝 생성 (1~3 고정) + reference(list[str])를 TextField로 저장 가능한 문자열로 변환
+          step_objs = []
+          for idx, s in enumerate(steps, start=1):
+               due_str = s.get("due")  # "YYYY-MM-DD" or None
+               due_date = None
+               if due_str:
+                    s2 = str(due_str).replace(".", "-").replace("/", "-")
+                    due_date = parse_date(s2)
 
-            step_objs.append(MissionStep(
-                mission=mission,
-                step_no=idx,  # 1~3
-                title=str(s.get("title", "")).strip()[:200],
-                description=str(s.get("description", "")).strip(),
-                reference=reference_text,
-                due=due_date,
-            ))
-        MissionStep.objects.bulk_create(step_objs)
+               ref_val = s.get("reference") or []
+               if isinstance(ref_val, list):
+                    reference_text = "- " + "\n- ".join([str(x).strip() for x in ref_val if str(x).strip()])
+               else:
+                    reference_text = str(ref_val).strip()
 
-    # 응답(필요시 Serializer로 교체 가능)
-    return Response({
-        "mission": {
-            "id": mission.id,
-            "request_id": mission.request_id,
-            "youth_id": mission.youth_id,
-            "deadline": mission.deadline,
-            "status": mission.status,
-            "ai_model": mission.ai_model,
-            "ai_plan_ver": mission.ai_plan_ver,
-        },
-        "steps": [
-            {
-                "step_no": s.step_no,
-                "title": s.title,
-                "description": s.description,
-                "reference": s.reference,  # 불릿 텍스트
-                "due": s.due,
-            } for s in mission.steps.order_by("step_no")
-        ],
-    }, status=status.HTTP_201_CREATED)
+               step_objs.append(MissionStep(
+                    mission=mission,
+                    step_no=idx,  # 1~3
+                    title=str(s.get("title", "")).strip()[:200],
+                    description=str(s.get("description", "")).strip(),
+                    reference=reference_text,
+                    due=due_date,
+               ))
+          MissionStep.objects.bulk_create(step_objs)
+
+     # 응답(필요시 Serializer로 교체 가능)
+     return Response({
+          "mission": {
+               "id": mission.id,
+               "request_id": mission.request_id,
+               "youth_id": mission.youth_id,
+               "deadline": mission.deadline,
+               "status": mission.status,
+               "ai_model": mission.ai_model,
+               "ai_plan_ver": mission.ai_plan_ver,
+          },
+          "steps": [
+               {
+                    "step_no": s.step_no,
+                    "title": s.title,
+                    "description": s.description,
+                    "reference": s.reference,  # 불릿 텍스트
+                    "due": s.due,
+               } for s in mission.steps.order_by("step_no")
+          ],
+     }, status=status.HTTP_201_CREATED)
 
 ALLOWED_FEEDBACK_EXTS = {".png", ".jpg", ".jpeg", ".pdf", ".mp4"}  # 중간 피드백 허용
 MAX_FILE_MB = 6
