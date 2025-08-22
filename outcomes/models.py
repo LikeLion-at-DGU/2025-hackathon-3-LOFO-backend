@@ -28,15 +28,14 @@ def outcome_file_path(instance, filename):
 class OutcomeFile(TimeStampedModel):
      class Kind(models.TextChoices):
           IMAGE = "IMAGE", "이미지"
-          VIDEO = "VIDEO", "비디오"
-          PDF = "PDF", "PDF"
+          TEXT = "TEXT", "텍스트"
 
      outcome = models.ForeignKey(Outcome, on_delete=models.CASCADE, related_name="files")
      kind = models.CharField(max_length=10, choices=Kind.choices)
 
      file = models.FileField(
           upload_to=outcome_file_path,
-          validators=[FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "mp4", "pdf"])]
+          validators=[FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "txt"])]
      )
      mime_type = models.CharField(max_length=100, blank=True)
      size_bytes = models.BigIntegerField(null=True, blank=True)
