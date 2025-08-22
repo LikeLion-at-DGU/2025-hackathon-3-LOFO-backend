@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 from django.utils import timezone
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.permissions import IsAuthenticated
@@ -263,10 +263,16 @@ def nopo_received(request):
         owner=profile
     ).count()
 
-    # 커버 후보만 prefetch
-    cover_qs = OutcomeFile.objects.filter(
-        kind__in=[OutcomeFile.Kind.IMAGE, OutcomeFile.Kind.TXT]
-    ).order_by("order", "id")
+    # 커버 후보
+    cover_qs = (
+        OutcomeFile.objects
+        .filter(
+            Q(kind=OutcomeFile.Kind.IMAGE) |
+            Q(mime_type__startswith="text/") |
+            Q(file__iendswith=".txt")
+        )
+        .order_by("order", "id")
+    )
 
     # Outcome 목록 (상인 요청에 제출된 것들)
     outcomes_qs = (
@@ -281,9 +287,14 @@ def nopo_received(request):
     for o in outcomes_qs:
         files = list(o.files.all())
         img = next((f for f in files if f.kind == OutcomeFile.Kind.IMAGE), None)
-        txt = next((f for f in files if f.kind == OutcomeFile.Kind.TXT), None) if not img else None
+        txt = None
+        if not img:
+            txt = next((
+                f for f in files
+                if (getattr(f, "mime_type", "") or "").startswith("text/") or
+                (getattr(getattr(f, "file", None), "name", "") or "").lower().endswith(".txt")
+            ), None)
         o._prefetched_cover_files = [img or txt] if (img or txt) else []
-
     # 직렬화
     data = {
         "ongoing_count": ongoing_count,
