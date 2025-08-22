@@ -68,6 +68,57 @@ def mission_detail(request, id):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@api_view(["GET"])
+def my_mission(request):
+    profile = getattr(request.user, "profile", None)
+    if not profile:
+        return Response({"detail": "프로필이 필요합니다."}, status=status.HTTP_403_FORBIDDEN)
+
+    mission = (
+        Mission.objects
+        .select_related("request")
+        .prefetch_related("steps")
+        .filter(youth=profile, status=Mission.Status.IN_PROGRESS)
+        .order_by("-created_at")
+        .first()
+    )
+
+    if not mission:
+        return Response({"exists": False, "detail": "진행 중 미션이 없습니다."}, status=status.HTTP_200_OK)
+
+    req = mission.request
+    data = {
+        "exists": True,
+        "mission": {
+            "id": mission.id,
+            "status": mission.status,
+            "deadline": mission.deadline,
+            "plan": mission.plan,
+            "created_at": mission.created_at,
+        },
+        "request": {
+            "id": req.id,
+            "title": req.title,
+            "store_name": req.store_name,
+            "image": request.build_absolute_uri(req.image.url) if getattr(req, "image", None) else None,
+            "url": req.url,
+            "category": req.category,
+            "category_display": req.get_category_display(),
+        },
+        "steps": [
+            {
+                "step_no": s.step_no,
+                "title": s.title,
+                "description": s.description,
+                "reference": s.reference,
+                "due": s.due,
+                "status": s.status,
+            }
+            for s in mission.steps.all().order_by("step_no")
+        ],
+    }
+    return Response(data, status=status.HTTP_200_OK)
+
 @api_view(["POST"])
 def save_mission(request):
     req_id = request.data.get("request_id")
