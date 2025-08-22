@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from django.db.models import Prefetch, Count, Exists, OuterRef
+from django.db.models import Prefetch, Count, Exists, OuterRef, Case, When, BooleanField
 from outcomes.models import Outcome, OutcomeFile
 from .models import Like
 from .serializers import OutcomeCardSerializer
@@ -35,6 +35,15 @@ def comunity(request):  # outcome list
 
     # 좋아요 개수
     qs = qs.annotate(like_count=Count("likes", distinct=True))
+
+    # 좋아요 10개 이상이면 노포픽(배지). 조회 시점에 계산.
+    qs = qs.annotate(
+        nopo_pick=Case(
+            When(like_count__gte=10, then=True), 
+            default=False,
+            output_field=BooleanField(),
+        )
+    )
 
     # 내가 좋아요 눌렀는지
     if request.user.is_authenticated and hasattr(request.user, "profile"):
