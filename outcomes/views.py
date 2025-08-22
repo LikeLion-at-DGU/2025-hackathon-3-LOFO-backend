@@ -1,7 +1,5 @@
 # outcomes/views.py
 from django.db.models import Prefetch, Count, Exists, OuterRef, Case, When, BooleanField
-from django.http import FileResponse, HttpResponseRedirect, Http404
-from django.conf import settings
 from django.shortcuts import redirect
 
 from rest_framework.decorators import api_view, permission_classes
@@ -15,8 +13,6 @@ from missions.models import Mission
 from inquiries.models import NopoFeedback, Saved, Request
 from main.serializers import OutcomeCardSerializer
 
-import io
-import os
 
 # 청년 마이페이지 (포트폴리오로 연결됨)
 @api_view(["GET"])
@@ -34,7 +30,9 @@ def youth_portfolio(request):
     if not profile:
         return Response({"detail": "프로필이 필요합니다."}, status=status.HTTP_400_BAD_REQUEST)
 
-    cover_qs = OutcomeFile.objects.order_by("order", "id")
+    cover_qs = OutcomeFile.objects.filter(
+        kind__in=[OutcomeFile.Kind.IMAGE, OutcomeFile.Kind.TXT]
+    ).order_by("order", "id")
 
     qs = (
         Outcome.objects
@@ -63,7 +61,10 @@ def youth_portfolio(request):
     )
 
     for o in qs:
-        o._prefetched_cover_files = list(o.files.all()[:1])
+        files = list(o.files.all())
+        img = next((f for f in files if f.kind == OutcomeFile.Kind.IMAGE), None)
+        txt = next((f for f in files if f.kind == OutcomeFile.Kind.TXT), None) if not img else None
+        o._prefetched_cover_files = [img or txt] if (img or txt) else []
 
     ser = OutcomeCardSerializer(qs, many=True, context={"request": request})
     return Response(ser.data, status=status.HTTP_200_OK)
@@ -110,7 +111,9 @@ def youth_insights(request):
     feedback_cnt = fb_qs.count()
 
     # 노포픽 작품
-    cover_qs = OutcomeFile.objects.order_by("order", "id")
+    cover_qs = OutcomeFile.objects.filter(
+        kind__in=[OutcomeFile.Kind.IMAGE, OutcomeFile.Kind.TXT]
+    ).order_by("order", "id")
     pick_qs = (
         Outcome.objects
         .filter(youth=profile)
@@ -135,8 +138,12 @@ def youth_insights(request):
         ) 
         .annotate(is_liked=Exists(Like.objects.filter(outcome=OuterRef("pk"), user=profile)))
     )
+    # 커버 후보 1개만: 이미지 우선 → 없으면 TXT
     for o in pick_qs:
-        o._prefetched_cover_files = list(o.files.all()[:1])  # 카드 썸네일 1장
+        files = list(o.files.all())
+        img = next((f for f in files if f.kind == OutcomeFile.Kind.IMAGE), None)
+        txt = next((f for f in files if f.kind == OutcomeFile.Kind.TXT), None) if not img else None
+        o._prefetched_cover_files = [img or txt] if (img or txt) else []
 
     pick_ser = OutcomeCardSerializer(pick_qs, many=True, context={"request": request})
 
@@ -232,7 +239,10 @@ def youth_saved(request):
         })
 
     # 커뮤니티에서 좋아요한 작품: 개수 + 전체 목록
-    cover_qs = OutcomeFile.objects.order_by("order", "id")
+    cover_qs = OutcomeFile.objects.filter(
+        kind__in=[OutcomeFile.Kind.IMAGE, OutcomeFile.Kind.TXT]
+    ).order_by("order", "id")
+
     liked_qs = (
         Outcome.objects
         .filter(likes__user=profile)
@@ -251,7 +261,10 @@ def youth_saved(request):
         .distinct()
     )
     for o in liked_qs:
-        o._prefetched_cover_files = list(o.files.all()[:1])
+        files = list(o.files.all())
+        img = next((f for f in files if f.kind == OutcomeFile.Kind.IMAGE), None)
+        txt = next((f for f in files if f.kind == OutcomeFile.Kind.TXT), None) if not img else None
+        o._prefetched_cover_files = [img or txt] if (img or txt) else []
 
     liked_ser = OutcomeCardSerializer(liked_qs, many=True, context={"request": request})
 
