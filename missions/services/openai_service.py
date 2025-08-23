@@ -179,33 +179,52 @@ def build_step_feedback(
      image_data_urls: list[str] | None = None,
      file_names: list[str] | None = None,
      extra_texts: list[str] | None = None,
-) -> str:
+     ) -> tuple[str, dict]:
+     """
+     return: (feedback_text, usage_info)
+     usage_info = {"prompt_tokens": int, "completion_tokens": int, "total_tokens": int}
+     """
      image_data_urls = image_data_urls or []
      file_names      = file_names or []
      extra_texts     = extra_texts or []
 
-     # 최대한 짧게: 총평 1문장, 개선 3개, 다음 액션 3개, 업로드 체크 1줄
-     system = "당신은 실무 멘토입니다. 간결하고 실천 가능한 피드백만 주세요."
+     # ✅ 톤앤매너 지침 반영
+     system = "너는 청년 사용자가 만든 콘텐츠에 대해 피드백을 주는 AI 코치다. JSON이 아니라 순수 텍스트만 출력해라."
 
-     content = [
-          {"type": "text", "text":
-               f"[목표]\n{goal}\n"
-               f"[단계]\n{step_no}단계: {step_title}\n"
-               f"[메모]\n{note or '없음'}\n\n"
-               "[응답 형식]\n"
-               "총평: ... (한 줄)\n"
-               "개선(3): - ...\n- ...\n- ...\n"
-               "다음액션(3): - ...\n- ...\n- ...\n"
-               "업로드체크(1줄): 형식/규격 중심\n"
-          }
-     ]
+     user_prompt = f"""
+     [목표]
+     {goal}
+
+     [단계]
+     {step_no}단계: {step_title}
+
+     [메모]
+     {note or "없음"}
+
+     [톤앤매너 지침]
+     - 항상 잘한 점을 먼저 말한다.
+     - 개선 아이디어는 1~2개만, 추상적이 아니라 바로 적용 가능한 **구체적 팁**으로 제시한다.
+     - 다음 단계는 단순 지시가 아니라, **다음 미션과 연결되는 사전 연습(1.5단계/2.5단계)**처럼 짧게 제시한다.
+     - 마무리 멘트는 짧고 긍정적으로, 성취감과 반복 참여 의욕을 주도록 한다.
+
+     [출력 구조]
+     잘한 점: [칭찬, 1~2문장]
+
+     개선 아이디어:
+     - [구체적 보완 팁1]
+     - [구체적 보완 팁2] (선택적)
+
+     다음 단계: [다음 미션과 연결되는 1.5단계/2.5단계 액션 제안, 한 문장]
+
+     마무리 멘트: [짧고 긍정적인 동기부여 멘트]
+     """.strip()
+
+     content = [{"type": "text", "text": user_prompt}]
 
      if file_names:
           content.append({"type": "text", "text": "[파일명]\n" + ", ".join(file_names)})
-
      for url in image_data_urls:
           content.append({"type": "image_url", "image_url": {"url": url}})
-
      for t in extra_texts:
           snippet = (t[:1000] + "…") if len(t) > 1000 else t
           content.append({"type": "text", "text": f"[텍스트 발췌]\n{snippet}"})
@@ -216,7 +235,14 @@ def build_step_feedback(
                {"role": "system", "content": system},
                {"role": "user", "content": content},
           ],
-          temperature=0.25,
+          temperature=0.4,  # 살짝 다양성 줘도 자연스러운 표현 가능
           max_tokens=320,
      )
-     return resp.choices[0].message.content.strip()
+
+     feedback_text = resp.choices[0].message.content.strip()
+     usage_info = {
+          "prompt_tokens": getattr(resp.usage, "prompt_tokens", None),
+          "completion_tokens": getattr(resp.usage, "completion_tokens", None),
+          "total_tokens": getattr(resp.usage, "total_tokens", None),
+     }
+     return feedback_text, usage_info
