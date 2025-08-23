@@ -5,8 +5,7 @@ from django.utils import timezone
 from django.db.models import Prefetch, Q
 
 from rest_framework.decorators import api_view, parser_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
@@ -166,7 +165,7 @@ def nopo_request(request):
 
 # 요청입력
 @api_view(["POST"])
-@parser_classes([MultiPartParser])
+@parser_classes([MultiPartParser, FormParser, JSONParser])
 def nopo_request_create(request):
     profile = getattr(request.user, "profile", None)
     if profile is None:
@@ -196,9 +195,35 @@ def nopo_request_create(request):
     )
 
 
+# 요청 단건 조회 (수정 화면 진입용)
+@api_view(["GET"])
+def nopo_request_detail(request, request_id: int):
+    profile = getattr(request.user, "profile", None)
+    if profile is None:
+        return Response({"detail": "프로필이 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+    req = get_object_or_404(Request, id=request_id)
+
+    # 본인 요청만 조회 가능
+    if req.owner_id != profile.id:
+        raise PermissionDenied("본인 요청만 조회할 수 있습니다.")
+
+    return Response({
+        "id": req.id,
+        "store_name": req.store_name,
+        "url": req.url,
+        "category": req.category,
+        "title": req.title,
+        "content": req.content,
+        "status": req.status,
+        "saved_count": req.saved_count,
+        "created_at": req.created_at,
+    }, status=status.HTTP_200_OK)
+
+
 # 요청수정
 @api_view(["PATCH"])
-@parser_classes([MultiPartParser])   # 이미지 교체 허용
+@parser_classes([MultiPartParser, FormParser, JSONParser])    # 이미지 교체 허용
 def nopo_request_edit(request, request_id: int):
     profile = getattr(request.user, "profile", None)
     if profile is None:
