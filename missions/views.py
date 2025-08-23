@@ -383,12 +383,12 @@ def mission_feedback(request):
      goal_text = (
           getattr(mission.request, "title", None)
           or getattr(mission.request, "name", None)
-          or getattr(mission, "plan", {}).get("goal")  # 혹시 plan에 저장했다면
+          or (mission.plan.get("goal") if isinstance(mission.plan, dict) else None)
           or "요청 목표"
      )
 
      try:
-          feedback = build_step_feedback(
+          feedback_text, usage = build_step_feedback(
                goal=goal_text,
                step_no=step_no,
                step_title=step.title or f"{step_no}단계",
@@ -407,9 +407,11 @@ def mission_feedback(request):
      return Response({
           "mission_id": mission.id,
           "step_no": step_no,
-          "feedback": feedback,
+          "feedback": feedback_text,
           "feedback_count": step.feedback_count,
+          "usage": usage,
      }, status=status.HTTP_200_OK)
+
 
 
 
