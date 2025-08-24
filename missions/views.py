@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404
 
 from datetime import datetime, time
 
+from .services.openai_service import build_plan, build_step_feedback
 from inquiries.models import Request, AiRequest, Saved
 from accounts.models import Profile
 from .models import Mission, MissionStep
@@ -19,9 +20,11 @@ from .serializers import RequestListSerializer, AiRequestListSerializer
 
 import os, base64, mimetypes
 import fitz  # PyMuPDF
-from .services.openai_service import *
 from outcomes.models import *
 
+from google import genai
+client = genai.Client()
+MODEL = "gemini-2.0-flash-lite"
 
 # 청년 홈: 상인 요청 리스트
 @api_view(["GET"])
@@ -189,30 +192,34 @@ def generate_plan(request):
           youth: Profile = request.user.profile
      except Exception:
           return Response({"detail": "프로필이 필요합니다."}, status=status.HTTP_403_FORBIDDEN)
-     
+
      if Mission.objects.filter(youth=youth, status=Mission.Status.IN_PROGRESS).exists():
           return Response(
                {"detail": "이미 진행 중인 미션이 있습니다. 완료/포기/만료 후 새 계획을 만들 수 있어요."},
                status=status.HTTP_409_CONFLICT
           )
 
-     # 마감일 파싱 (USE_TZ 설정에 맞게 aware/naive 반환되는 헬퍼 사용)
+     # 마감일 파싱
      deadline_dt = _parse_deadline_to_dt(deadline_str)
      if not deadline_dt:
           return Response({"detail": "deadline 형식이 올바르지 않습니다."}, status=status.HTTP_400_BAD_REQUEST)
 
-     # Request의 제목/내용을 안전하게 가져와서 AI에 전달
+     # Request의 제목/내용
      req_title = getattr(req_obj, "title", None) or getattr(req_obj, "name", None) or ""
      req_desc  = getattr(req_obj, "content", None) or getattr(req_obj, "description", None) or ""
 
-     # AI로 플랜 생성
+     # AI로 플랜 생성 (build_plan은 (plan_json, usage) 튜플 반환)
      safe_deadline_str = str(deadline_str).replace(".", "-").replace("/", "-")
-     plan_json = build_plan(
-     goal=goal,
-     deadline_date_str=safe_deadline_str,
-     request_title=req_title,
-     request_desc=req_desc,
+     plan_result = build_plan(
+          goal=goal,
+          deadline_date_str=safe_deadline_str,
+          request_title=req_title,
+          request_desc=req_desc,
      )
+     if isinstance(plan_result, tuple):
+          plan_json, plan_usage = plan_result
+     else:
+          plan_json, plan_usage = plan_result, None
 
      steps = plan_json.get("steps", [])
      if not isinstance(steps, list) or len(steps) != 3:
@@ -228,22 +235,54 @@ def generate_plan(request):
                youth=youth,
                deadline=deadline_dt,
                status=Mission.Status.IN_PROGRESS,
-               ai_model="gpt-4o-mini",
+               ai_model="gemini-2.0-flash-lite",
                ai_plan_ver=next_ver,
                plan=plan_json,
           )
 
+          # -------- due 보정 로직 시작 --------
+          from datetime import timedelta
+          today = timezone.localdate()
+          final_due = mission.deadline.date()
+          span_days = max((final_due - today).days, 0)
+
+          # 대략 3등분 기준(최소 2일 간격 보장)
+          g1 = max(2, span_days // 3)          # step1 목표일 = 오늘 + g1
+          g2 = max(2, (2 * span_days) // 3)    # step2 목표일 = 오늘 + g2
+
+          def clamp(d):
+               """오늘~최종 마감 사이로 보정"""
+               if d is None:
+                    return None
+               if d < today:
+                    return today
+               if d > final_due:
+                    return final_due
+               return d
+          # -------- due 보정 로직 끝 --------
+
           step_objs = []
+          prev_due = None
           for idx, s in enumerate(steps, start=1):
-               # due 파싱
+               # 원본 due 파싱
+               raw_due = (s.get("due") or "").strip()
                due_date = None
-               due_str = (s.get("due") or "").strip()
-               if due_str:
-                    s2 = due_str.replace(".", "-").replace("/", "-")
+               if raw_due:
+                    s2 = raw_due.replace(".", "-").replace("/", "-")
                     due_date = parse_date(s2)
 
+               # 3단계는 항상 최종 마감일 고정
                if idx == 3:
-                    due_date = mission.deadline.date()
+                    due_date = final_due
+               else:
+                    # 과거/범위 밖이면 균등 분배 디폴트 사용
+                    if not due_date or not (today <= due_date <= final_due):
+                         target = today + timedelta(days=(g1 if idx == 1 else g2))
+                         due_date = clamp(target)
+
+               # 단계 간 단조 증가 보장(이전 단계보다 최소 1일 뒤)
+               if prev_due and due_date <= prev_due:
+                    due_date = clamp(prev_due + timedelta(days=1))
 
                # 정규화된 키 신뢰
                title_val = (s.get("title") or s.get("mission_title") or f"단계 {idx}").strip()[:200]
@@ -258,29 +297,35 @@ def generate_plan(request):
                     reference=reference_text,
                     due=due_date,
                ))
+               prev_due = due_date
+
           MissionStep.objects.bulk_create(step_objs)
 
      # 응답
      return Response({
-     "mission": {
-          "id": mission.id,
-          "request_id": mission.request_id,
-          "youth_id": mission.youth_id,
-          "deadline": mission.deadline,
-          "status": mission.status,
-          "ai_model": mission.ai_model,
-          "ai_plan_ver": mission.ai_plan_ver,
-     },
-     "steps": [
-          {
-               "step_no": s.step_no,
-               "title": s.title,
-               "description": s.description,
-               "reference": s.reference,
-               "due": s.due,
-          } for s in mission.steps.order_by("step_no")
-     ],
+          "mission": {
+               "id": mission.id,
+               "request_id": mission.request_id,
+               "youth_id": mission.youth_id,
+               "deadline": mission.deadline,
+               "status": mission.status,
+               "ai_model": mission.ai_model,
+               "ai_plan_ver": mission.ai_plan_ver,
+          },
+          "steps": [
+               {
+                    "step_no": s.step_no,
+                    "title": s.title,
+                    "description": s.description,
+                    "reference": s.reference,
+                    "due": s.due,
+               } for s in mission.steps.order_by("step_no")
+          ],
+          "usage": plan_usage,  # prompt/completion/total 토큰
      }, status=status.HTTP_201_CREATED)
+
+
+
 
 ALLOWED_FEEDBACK_EXTS = {".png", ".jpg", ".jpeg", ".txt"}
 MAX_FILE_MB = 6
@@ -298,17 +343,6 @@ def _validate_uploads(files):
           if size_mb > MAX_FILE_MB:
                too_big.append(f.name)
      return bad_ext, too_big
-
-def _img_to_data_url(uploaded_file) -> str | None:
-     name = (uploaded_file.name or "").lower()
-     ct   = getattr(uploaded_file, "content_type", "") or mimetypes.guess_type(name)[0] or ""
-     if not (name.endswith((".png", ".jpg", ".jpeg")) or (ct and ct.startswith("image/"))):
-          return None
-     raw = uploaded_file.read()
-     uploaded_file.seek(0)
-     b64 = base64.b64encode(raw).decode("utf-8")
-     mime = ct or ("image/png" if name.endswith(".png") else "image/jpeg")
-     return f"data:{mime};base64,{b64}"
 
 
 def _txt_to_text(uploaded_file, max_chars=4000) -> str | None:
@@ -329,6 +363,22 @@ def _txt_to_text(uploaded_file, max_chars=4000) -> str | None:
      return text
 
 
+def _file_to_inline_part(uploaded_file):
+     """
+     업로드 파일을 Gemini inline_data part로 변환
+     return: {"inline_data": {"mime_type": "...", "data": "<base64>"}} | None
+     (이미지 파일만 처리)
+     """
+     name = (uploaded_file.name or "").lower()
+     ct = getattr(uploaded_file, "content_type", "") or mimetypes.guess_type(name)[0] or ""
+     if not (ct and ct.startswith("image/")):
+          return None
+     raw = uploaded_file.read()
+     uploaded_file.seek(0)
+     b64 = base64.b64encode(raw).decode("utf-8")
+     return {"inline_data": {"mime_type": ct, "data": b64}}
+
+
 @api_view(["POST"])
 @parser_classes([MultiPartParser, FormParser])
 def mission_feedback(request):
@@ -344,10 +394,10 @@ def mission_feedback(request):
           step_no = int(step_no_raw)
      except ValueError:
           return Response({"detail": "step_no는 정수여야 합니다."},
-                         status=status.HTTP_400_BAD_REQUEST)
 
-     if step_no not in (1, 2):
-          return Response({"detail": "step_no는 1 또는 2만 가능합니다."},
+                         status=status.HTTP_400_BAD_REQUEST)
+     if step_no not in (1, 2, 3):
+          return Response({"detail": "step_no는 1, 2, 3만 가능합니다."},
                          status=status.HTTP_400_BAD_REQUEST)
 
      mission = get_object_or_404(Mission, pk=mission_id)
@@ -357,6 +407,12 @@ def mission_feedback(request):
           s1 = get_object_or_404(MissionStep, mission=mission, step_no=1)
           if s1.status != MissionStep.StepStatus.DONE:
                return Response({"detail": "2단계 피드백은 1단계를 먼저 완료해 주세요."},
+                              status=status.HTTP_409_CONFLICT)
+
+     if step_no == 3:
+          s2 = get_object_or_404(MissionStep, mission=mission, step_no=2)
+          if s2.status != MissionStep.StepStatus.DONE:
+               return Response({"detail": "3단계 피드백은 2단계를 먼저 완료해 주세요."},
                               status=status.HTTP_409_CONFLICT)
 
      files = request.FILES.getlist("files")
@@ -369,12 +425,13 @@ def mission_feedback(request):
           return Response({"detail": f"허용되지 않는 확장자: {', '.join(bad_ext)}"},
                          status=status.HTTP_400_BAD_REQUEST)
 
-     image_data_urls, text_snippets, file_names = [], [], []
+     image_parts, text_snippets, file_names = [], [], []
+
      for f in files:
           file_names.append(f.name)
-          url = _img_to_data_url(f)
-          if url:
-               image_data_urls.append(url)
+          inline_part = _file_to_inline_part(f)
+          if inline_part:
+               image_parts.append(inline_part)
                continue
           t = _txt_to_text(f)
           if t:
@@ -393,7 +450,7 @@ def mission_feedback(request):
                step_no=step_no,
                step_title=step.title or f"{step_no}단계",
                note=note,
-               image_data_urls=image_data_urls,
+               image_parts=image_parts,
                file_names=file_names,
                extra_texts=text_snippets,
           )
