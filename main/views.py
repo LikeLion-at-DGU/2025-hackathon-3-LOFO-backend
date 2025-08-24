@@ -38,7 +38,7 @@ def comunity(request):  # outcome list
 
     # 좋아요 10개 이상이면 노포픽(배지). 조회 시점에 계산.
     qs = qs.annotate(
-        nopo_pick=Case(
+        nopo_pick_calc=Case(
             When(like_count__gte=10, then=True), 
             default=False,
             output_field=BooleanField(),

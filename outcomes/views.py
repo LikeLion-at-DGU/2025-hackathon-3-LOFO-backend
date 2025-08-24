@@ -1,6 +1,6 @@
-# outcomes/views.py
 from django.db.models import Prefetch, Count, Exists, OuterRef, Case, When, BooleanField, Q
 from django.shortcuts import redirect
+from django.urls import reverse
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -265,6 +265,9 @@ def youth_saved(request):
             "image_url": image_url,
             "saved_count": r.saved_count,
             "created_at": r.created_at,
+            "toggle_url": request.build_absolute_uri(   
+                reverse("request-save-toggle", args=[r.id])
+            ),
         })
 
     # 커뮤니티에서 좋아요한 작품: 개수 + 전체 목록
