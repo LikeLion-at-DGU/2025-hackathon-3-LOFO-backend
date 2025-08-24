@@ -1,0 +1,342 @@
+[
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 로티세리치킨",
+            "image": "requests/ai/promotion_planning/promotion_planning_001.jpg",
+            "url": "https://example.com/ai/promotion_planning/001",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "런칭 기념 1+1",
+            "content": "오픈 첫 주 ‘하프치킨 1+1’ 기획. 현수막/전단/배너 세트와 SNS 카드뉴스 4장, 매장 POS 문구까지 패키지로 제작합니다.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 국밥집",
+            "image": "requests/ai/promotion_planning/promotion_planning_002.jpg",
+            "url": "https://example.com/ai/promotion_planning/002",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "점심 타임세일",
+            "content": "평일 11:30~13:30 직장인 1,000원 할인 캠페인. 네이버 지도/플레이스 배너, 카카오채널 톡드립 문구, A형 스탠드 디자인 포함.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 포케하우스",
+            "image": "requests/ai/promotion_planning/promotion_planning_003.jpg",
+            "url": "https://example.com/ai/promotion_planning/003",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "건강한 점심 캠페인",
+            "content": "‘칼로리 공개’ 캠페인: 500kcal 이하 메뉴 3선 강조. 인스타 릴스/스토리 템플릿, 회사 밀집지역 전단, 사무실 엘리베이터 포스터 세트.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 타파스바",
+            "image": "requests/ai/promotion_planning/promotion_planning_004.jpg",
+            "url": "https://example.com/ai/promotion_planning/004",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "야간 해피아워",
+            "content": "평일 21~23시 와인·타파스 세트 20% 할인. 바간판, 테이블 텐트, 네온 스타일 SNS 카드 5장, 구글 비즈니스 프로필 업데이트 문구 포함.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 콜드브루랩",
+            "image": "requests/ai/promotion_planning/promotion_planning_005.jpg",
+            "url": "https://example.com/ai/promotion_planning/005",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "리필 멤버십 론칭",
+            "content": "월 9,900원 콜드브루 리필 멤버십. 가입 리워드 카드, 적립 도장 디자인, QR 가입 랜딩 문구, 안내 포스터 제공.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 버블티",
+            "image": "requests/ai/promotion_planning/promotion_planning_006.jpg",
+            "url": "https://example.com/ai/promotion_planning/006",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "인증샷 챌린지",
+            "content": "컵 슬리브 한정 디자인 + ‘펄 업그레이드 무료’ 해시태그 이벤트. 릴스 스크립트, 틱톡 컷 편집 가이드, 포토존 보드 제작 포함.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 샌드위치클럽",
+            "image": "requests/ai/promotion_planning/promotion_planning_007.jpg",
+            "url": "https://example.com/ai/promotion_planning/007",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "직장인 단체주문",
+            "content": "10개 이상 단체 주문 시 배송비 무료 + 음료 제공. B2B 견적서 템플릿, 배너, 카톡 채널 안내 이미지, 쿠폰 코드 체계 설계 포함.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 돈카츠정",
+            "image": "requests/ai/promotion_planning/promotion_planning_008.jpg",
+            "url": "https://example.com/ai/promotion_planning/008",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "리뷰 보상 캠페인",
+            "content": "네이버 리뷰 50자 이상 작성 시 고로케 증정. 리뷰 유도 카드, QR 테이블 스티커, 자동 답글 가이드, 악성 리뷰 대응 문구 세트 포함.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 파니니바",
+            "image": "requests/ai/promotion_planning/promotion_planning_009.jpg",
+            "url": "https://example.com/ai/promotion_planning/009",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "런치 세트 업셀링",
+            "content": "파니니+수프+음료 세트 기획. 디지털 메뉴보드, 카운터 탑 보드, 세트 전환 카피(점원 멘트 스크립트)까지 패키지로 제공합니다.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 카츠산도",
+            "image": "requests/ai/promotion_planning/promotion_planning_010.jpg",
+            "url": "https://example.com/ai/promotion_planning/010",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "콜라보 한정 메뉴",
+            "content": "인근 베이커리와 콜라보 ‘브리오슈 카츠산도’ 한정 출시. 티저-론칭-재고 알림 3단계 SNS 타임라인과 매대 POP 구성.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 토스트하우스",
+            "image": "requests/ai/promotion_planning/promotion_planning_011.jpg",
+            "url": "https://example.com/ai/promotion_planning/011",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "출근길 샘플링",
+            "content": "7~9시 역앞 샘플링 + 쿠폰 배포. 팀복 배너, 시식 스티커, 쿠폰 코드(재방문 측정) 체계 설계와 리마인드 메시지 문안 포함.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 비건베이커리",
+            "image": "requests/ai/promotion_planning/promotion_planning_012.jpg",
+            "url": "https://example.com/ai/promotion_planning/012",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "친환경 캠페인",
+            "content": "텀블러·리유저블 용기 지참 시 500원 할인. 친환경 배지 디자인, 안내 스티커, ESG 스토리 카드뉴스 5장 제작 포함.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 말차라운지",
+            "image": "requests/ai/promotion_planning/promotion_planning_013.jpg",
+            "url": "https://example.com/ai/promotion_planning/013",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "시즌 한정 MD",
+            "content": "말차 머그·스티커팩 출시 프로모션. 패키지 목업, 굿즈 상세 페이지, 포토카드 증정 이벤트 운영안까지 세트로 요청합니다.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 수제도넛",
+            "image": "requests/ai/promotion_planning/promotion_planning_014.jpg",
+            "url": "https://example.com/ai/promotion_planning/014",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "리퍼럴 이벤트",
+            "content": "친구 추천 시 도넛 1개 무료. 추천 코드 설계, 포장박스 스티커, 인스타 스토리 템플릿, 매장 배너 및 카피 제공.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 칵테일바",
+            "image": "requests/ai/promotion_planning/promotion_planning_015.jpg",
+            "url": "https://example.com/ai/promotion_planning/015",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "DJ 나이트",
+            "content": "금·토 ‘DJ 나이트’ 기획. 포스터/릴스 오프너 5초, 테이블 리저브 카드, 인플루언서 초대장 eDM까지 풀세트로 제작합니다.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 소바야",
+            "image": "requests/ai/promotion_planning/promotion_planning_016.jpg",
+            "url": "https://example.com/ai/promotion_planning/016",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "비 오는 날 할인",
+            "content": "우산 지참 고객 온소바 1,000원 할인. 기상청 API 연동 안내 문구, 매장 입구 보드, 카카오채널 자동 발송 카피 포함.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 케밥하우스",
+            "image": "requests/ai/promotion_planning/promotion_planning_017.jpg",
+            "url": "https://example.com/ai/promotion_planning/017",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "학원가 타깃 프로모션",
+            "content": "학생증 제시 시 음료 무료. 학교 주변 전단, 인스타 스토리 9:16, 학원 강사용 단체 주문 안내 이미지 포함 세트 구성.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 스프카페",
+            "image": "requests/ai/promotion_planning/promotion_planning_018.jpg",
+            "url": "https://example.com/ai/promotion_planning/018",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "네이버 예약 전환",
+            "content": "네이버 예약 유도 배너·리뷰 위젯 가이드·예약 혜택 카피 제작. ‘예약 고객 전용 사이즈업’ 프로모션 운영안 포함.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 파에야주방",
+            "image": "requests/ai/promotion_planning/promotion_planning_019.jpg",
+            "url": "https://example.com/ai/promotion_planning/019",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "N주년 기념 페스티벌",
+            "content": "오픈 2주년 기념 주말 페스티벌. 한정 메뉴, 스탬프 투어, 공연 일정 포스터, 현장 포토월, 경품 추첨 운영 흐름도까지 설계합니다.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+            "owner": 1,
+            "is_ai": true,
+            "store_name": "AI 고기국수",
+            "image": "requests/ai/promotion_planning/promotion_planning_020.jpg",
+            "url": "https://example.com/ai/promotion_planning/020",
+            "status": "OPEN",
+            "category": "PROMOTION_PLANNING",
+            "title": "배달앱 프로모션",
+            "content": "배달 3,000원 할인 + 첫 주문 쿠폰팩. 배달앱 썸네일/메뉴 사진 규격화, 상단 배너 문구, 재주문 푸시 카피 세트로 제공합니다.",
+            "saved_count": 0,
+            "created_at": "2025-08-24T15:00:00+09:00",
+            "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    }
+]

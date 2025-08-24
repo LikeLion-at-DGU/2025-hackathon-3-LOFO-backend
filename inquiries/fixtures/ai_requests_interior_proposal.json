@@ -1,0 +1,342 @@
+[
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 브런치카페",
+        "image": "requests/ai/interior_proposal/interior_proposal_001.jpg",
+        "url": "https://example.com/ai/interior_proposal/001",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "화이트톤 브런치 인테리어",
+        "content": "화이트&우드 톤의 따뜻한 분위기. 자연광을 살리고 식물 장식을 활용해 ‘북유럽 감성 카페’ 느낌으로 제안합니다.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 수제버거",
+        "image": "requests/ai/interior_proposal/interior_proposal_002.jpg",
+        "url": "https://example.com/ai/interior_proposal/002",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "인더스트리얼 버거샵",
+        "content": "벽돌과 철재소재를 강조한 인더스트리얼 무드. 주방이 보이는 오픈형 구조로 활기찬 분위기를 연출합니다.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 와인바",
+        "image": "requests/ai/interior_proposal/interior_proposal_003.jpg",
+        "url": "https://example.com/ai/interior_proposal/003",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "빈티지 와인바 무드",
+        "content": "벽면 와인랙과 어두운 조명으로 프라이빗한 분위기. 벨벳 소파와 빈티지 포스터로 고급스러움을 강조합니다.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 디저트샵",
+        "image": "requests/ai/interior_proposal/interior_proposal_004.jpg",
+        "url": "https://example.com/ai/interior_proposal/004",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "핑크&골드 디저트샵",
+        "content": "파스텔 핑크 벽과 황금 프레임 장식으로 고급스러운 인스타그램 감성. 전면 유리 진열대로 제품을 강조합니다.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 라멘야",
+        "image": "requests/ai/interior_proposal/interior_proposal_005.jpg",
+        "url": "https://example.com/ai/interior_proposal/005",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "일본 전통 라멘집",
+        "content": "목재 바 테이블과 등롱 조명으로 아늑한 분위기. 오픈 주방 앞에 카운터석을 배치해 일본식 라멘야 체험감을 줍니다.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 중식당",
+        "image": "requests/ai/interior_proposal/interior_proposal_006.jpg",
+        "url": "https://example.com/ai/interior_proposal/006",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "모던 차이니즈 레스토랑",
+        "content": "레드 포인트 컬러와 모던한 라인 디자인. 둥근 테이블과 단체석 중심으로 단체 모임에 최적화된 배치를 제안합니다.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 치킨포차",
+        "image": "requests/ai/interior_proposal/interior_proposal_007.jpg",
+        "url": "https://example.com/ai/interior_proposal/007",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "스트릿 포차 무드",
+        "content": "형광 간판과 플라스틱 테이블·의자 조합. 붉은 조명과 포스터 벽으로 젊고 자유로운 스트릿 감성을 구현합니다.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 스테이크하우스",
+        "image": "requests/ai/interior_proposal/interior_proposal_008.jpg",
+        "url": "https://example.com/ai/interior_proposal/008",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "클래식 스테이크하우스",
+        "content": "짙은 원목가구와 가죽 소파, 촛불 조명으로 중후한 분위기. 오픈 키친 옆에 와인 저장고 디스플레이 배치.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 카레하우스",
+        "image": "requests/ai/interior_proposal/interior_proposal_009.jpg",
+        "url": "https://example.com/ai/interior_proposal/009",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "에스닉 카레 전문점",
+        "content": "인도풍 패턴과 오렌지 톤 벽지, 조명에 황동 펜던트 사용. 향신료 선반을 전면 배치하여 오리엔탈 무드를 강화합니다.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 스무디랩",
+        "image": "requests/ai/interior_proposal/interior_proposal_010.jpg",
+        "url": "https://example.com/ai/interior_proposal/010",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "헬시 무드 스무디샵",
+        "content": "밝은 화이트 타일과 그린 포인트 컬러. 천장에 식물 행잉, 메뉴판은 디지털 스크린으로 ‘웰니스 무드’ 연출.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 타코바",
+        "image": "requests/ai/interior_proposal/interior_proposal_011.jpg",
+        "url": "https://example.com/ai/interior_proposal/011",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "멕시칸 스트릿 무드",
+        "content": "형형색색의 벽화와 네온 간판을 활용해 활기찬 분위기. 바 테이블과 옐로·레드 포인트 컬러로 라틴 감성을 강조합니다.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 해산물포차",
+        "image": "requests/ai/interior_proposal/interior_proposal_012.jpg",
+        "url": "https://example.com/ai/interior_proposal/012",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "마린 무드 해산물포차",
+        "content": "블루·화이트 톤과 항구 느낌의 장식. 그물, 조개 장식, 통나무 테이블로 바닷가 포차 분위기를 재현합니다.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 카페도서관",
+        "image": "requests/ai/interior_proposal/interior_proposal_013.jpg",
+        "url": "https://example.com/ai/interior_proposal/013",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "북카페 무드",
+        "content": "벽면 전체를 책장으로 구성하고 조용한 독서 존 배치. 조명은 스탠드 조명으로 은은하게, 아늑한 분위기 연출.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 아이스크림랩",
+        "image": "requests/ai/interior_proposal/interior_proposal_014.jpg",
+        "url": "https://example.com/ai/interior_proposal/014",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "팝아트 아이스크림샵",
+        "content": "형광 네온사인과 팝아트 그래픽 벽화. 아이스크림 콘 모양 조형물을 포토존으로 배치해 MZ세대 타깃.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 펍앤그릴",
+        "image": "requests/ai/interior_proposal/interior_proposal_015.jpg",
+        "url": "https://example.com/ai/interior_proposal/015",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "어반 펍 스타일",
+        "content": "벽돌 벽과 LED 조명, 스포츠 중계 스크린을 설치해 캐주얼한 펍 분위기. 다양한 크래프트 맥주 전용 바도 구성.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 베이글하우스",
+        "image": "requests/ai/interior_proposal/interior_proposal_016.jpg",
+        "url": "https://example.com/ai/interior_proposal/016",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "뉴욕 델리 무드",
+        "content": "대리석 카운터와 뉴욕 지하철 간판 모티브. 베이글 진열대를 전면 배치해 ‘델리샵 감성’을 살린 인테리어.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 파스타하우스",
+        "image": "requests/ai/interior_proposal/interior_proposal_017.jpg",
+        "url": "https://example.com/ai/interior_proposal/017",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "로맨틱 파스타 레스토랑",
+        "content": "은은한 캔들 조명과 와인랙 장식. 커플석은 창가 위주로 배치해 데이트 장소로 최적화된 공간을 제안합니다.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 카페드로잉",
+        "image": "requests/ai/interior_proposal/interior_proposal_018.jpg",
+        "url": "https://example.com/ai/interior_proposal/018",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "아트 갤러리 카페",
+        "content": "화이트 갤러리 벽과 회화 작품 전시. 손님이 직접 드로잉할 수 있는 체험 공간을 마련해 예술적 감성을 강조합니다.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 감자탕집",
+        "image": "requests/ai/interior_proposal/interior_proposal_019.jpg",
+        "url": "https://example.com/ai/interior_proposal/019",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "푸근한 한식 무드",
+        "content": "따뜻한 원목 테이블과 전통 문양 패턴 벽지. 조명은 노란 톤으로 맞추고 한옥 감성을 살려 푸근함을 전달합니다.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 스무디바",
+        "image": "requests/ai/interior_proposal/interior_proposal_020.jpg",
+        "url": "https://example.com/ai/interior_proposal/020",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "비비드 스무디바",
+        "content": "레드·옐로우·그린의 비비드 톤 인테리어. 과일 그래픽과 대형 메뉴보드를 배치해 젊고 에너제틱한 분위기 완성.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    }
+]

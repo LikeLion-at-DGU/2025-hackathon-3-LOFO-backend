@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 from datetime import datetime, time
 
 from .services.openai_service import build_plan, build_step_feedback
-from inquiries.models import Request, AiRequest, Saved
+from inquiries.models import Request, Saved
 from accounts.models import Profile
 from .models import Mission, MissionStep
 from .serializers import RequestListSerializer
@@ -32,7 +32,7 @@ def home(request):
      category = request.GET.get("category")
      sort = request.GET.get("sort", "latest")  # 정렬 기준 기본 - 최신순
 
-     qs = Request.objects.filter(status="OPEN")  # status = OPEN 인 것만
+     qs = Request.objects.filter(status="OPEN", is_ai=False)  # status = OPEN 인 것만
      if category:
           qs = qs.filter(category=category)
 
@@ -51,7 +51,7 @@ def home_ai(request):
      category = request.GET.get("category")
      sort = request.GET.get("sort", "latest")
 
-     qs = AiRequest.objects.filter(status="IN_PROGRESS")
+     qs = Request.objects.filter(is_ai=True, status="OPEN")
      if category:
           qs = qs.filter(category=category)
 
@@ -60,7 +60,7 @@ def home_ai(request):
      else:  # 최신순
           qs = qs.order_by("-created_at")
 
-     serializer = AiRequestListSerializer(qs, many=True)
+     serializer = RequestListSerializer(qs, many=True, context={"request": request})
      return Response(serializer.data, status=status.HTTP_200_OK)
 
 
