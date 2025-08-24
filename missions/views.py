@@ -12,10 +12,10 @@ from django.shortcuts import get_object_or_404
 
 from datetime import datetime, time
 
-from inquiries.models import Request, AiRequest, Saved
+from inquiries.models import Request, Saved
 from accounts.models import Profile
 from .models import Mission, MissionStep
-from .serializers import RequestListSerializer, AiRequestListSerializer
+from .serializers import RequestListSerializer
 
 import os, base64, mimetypes
 import fitz  # PyMuPDF

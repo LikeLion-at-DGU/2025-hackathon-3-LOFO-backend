@@ -32,7 +32,8 @@ class Request(TimeStampedModel):
           AD_COPY = "AD_COPY", "광고문구"
 
      owner = models.ForeignKey("accounts.Profile", on_delete=models.PROTECT, related_name="requests", db_index=True)
-     
+     is_ai = models.BooleanField(default=False, db_index=True)
+
      # === 필수값 ===
      store_name = models.CharField(max_length=50, db_index=True, default="가게명") # 가게명
      image = models.ImageField(upload_to=request_image_path, default="") # 가게 사진 (요청 썸네일용)
@@ -48,22 +49,6 @@ class Request(TimeStampedModel):
 
      def __str__(self):
           return f"[{self.store_name}] {self.get_category_display() or '요청'}"
-
-class AiRequest(TimeStampedModel):
-     store_name = models.CharField(max_length=50, db_index=True, default="가게명")
-     image = models.ImageField(upload_to=ai_request_image_path, default="")
-     url = models.URLField(default="https://example.com")
-     category = models.CharField(max_length=30, choices=Request.Category.choices, db_index=True)
-     title = models.CharField(max_length=16, default="제목")
-     content = models.TextField(blank=True, null=True)
-     status = models.CharField(max_length=15, choices=Request.Status.choices, default=Request.Status.OPEN, db_index=True)
-     saved_count = models.IntegerField(default=0)
-
-     class Meta:
-          ordering = ["-created_at"]
-
-     def __str__(self):
-          return f"[AI:{self.store_name}] {self.get_category_display()} ({self.get_status_display()})"
 
 
 class Saved(TimeStampedModel):
