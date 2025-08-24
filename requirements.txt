@@ -9,3 +9,4 @@ tzdata==2025.2
 pymupdf
 python-dotenv
 openai
+google-genai>=0.3.0

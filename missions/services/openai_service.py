@@ -1,7 +1,8 @@
-from openai import OpenAI
+from google import genai
 import os, json, re, base64
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = genai.Client()
+MODEL = "gemini-2.0-flash-lite"
 
 #H JSON 형식만 추출
 def _json_only(s: str):
@@ -16,6 +17,17 @@ def _json_only(s: str):
           if m:
                return json.loads(m.group(0))
           raise # 끝까지 안되면 상위에서 처리
+
+# Gemini용 파일 파트 유틸
+def _file_to_inline_part(uploaded_file):
+     name = (uploaded_file.name or "").lower()
+     ct = getattr(uploaded_file, "content_type", "") or mimetypes.guess_type(name)[0] or ""
+     if not (ct and ct.startswith("image/")):
+          return None
+     raw = uploaded_file.read()
+     uploaded_file.seek(0)
+     b64 = base64.b64encode(raw).decode("utf-8")
+     return {"inline_data": {"mime_type": ct, "data": b64}}
 
 
 #모델 응답을 내부 DB 저장 스키마로 변환
@@ -78,6 +90,7 @@ def _normalize_plan_minimal(data) -> dict:
           })
      return {"steps": fixed}
 
+
 def build_plan(
      goal: str,
      deadline_date_str: str,
@@ -85,7 +98,8 @@ def build_plan(
      request_desc: str | None = None,
      store_name: str | None = None,
      category: str | None = None,
-     ) -> dict:
+) -> dict:
+     # 프롬프트 내용은 동일
      system = "JSON만 출력. 설명·예시 금지."
      user = f"""
 아래 맥락을 반영해 이 목표 달성을 위한 3단계 계획을 생성하라.
@@ -104,69 +118,45 @@ def build_plan(
 - 최종 마감: {deadline_date_str} (3단계는 반드시 이 날짜 이내)
 """.strip()
 
-     resp = client.chat.completions.create(
-          model="gpt-4o-mini",
-          messages=[
-               {"role": "system", "content": system},
-               {"role": "user", "content": user},
-          ],
-          temperature=0.0,
-          max_tokens=380,  # ← 넉넉히
-          response_format={
-               "type": "json_schema",
-               "json_schema": {
-                    "name": "plan",
-                    "schema": {
-                         "type": "object",
-                         "properties": {
-                         "steps": {
-                              "type": "array",
-                              "minItems": 3,
-                              "maxItems": 3,
-                              "items": {
-                                   "type": "object",
-                                   "properties": {
-                                        "mission_title": {"type": "string"},
-                                        "description": {"type": "string"},
-                                        "reference": {"type": "string"},
-                                        "due": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"}
-                                   },
-                                   "required": ["mission_title", "description", "reference", "due"],
-                                   "additionalProperties": False
-                              }
-                         }
-                         },
-                         "required": ["steps"],
-                         "additionalProperties": False
-                    }
-               }
-          }
+     # 하위호환: system_instruction 미지원 → 병합 프롬프트
+     merged = f"{system}\n\n{user}"
+
+     res = client.models.generate_content(
+          model=MODEL,
+          contents=[{"role": "user", "parts": [{"text": merged}]}],
+          # ✅ 구버전 호환: config 사용 (temperature / max_output_tokens 만)
+          config={
+               "temperature": 0.0,
+               "max_output_tokens": 380,
+          },
      )
 
-     raw = resp.choices[0].message.content
+     # SDK 버전별 안전 추출
+     raw = getattr(res, "text", None) or getattr(res, "output_text", None)
+     if not raw:
+          try:
+               parts = getattr(res.candidates[0].content, "parts", [])
+               raw = "\n".join(p.text for p in parts if getattr(p, "text", None))
+          except Exception:
+               raw = ""
+
      try:
           data = json.loads(raw)
      except Exception:
-          # 혹시 라이브러리/모델 변경 등으로 dict로 오는 경우도 방어
           data = raw if isinstance(raw, dict) else _json_only(raw)
-     return _normalize_plan_minimal(data)
 
+     um = getattr(res, "usage_metadata", None) or {}
+     usage_info = {
+          # Prompt 토큰 (입력)
+          "prompt_tokens": getattr(um, "prompt_token_count", None),
+          # Completion 토큰 (출력) — 버전 따라 이름 다름
+          "completion_tokens": getattr(um, "candidates_token_count", None)
+                                   or getattr(um, "output_token_count", None),
+          # 총합
+          "total_tokens": getattr(um, "total_token_count", None),
+          }
 
-
-# ---------- 이미지 인코딩 ----------
-def _img_to_data_url(uploaded_file) -> str | None:
-     name = (uploaded_file.name or "").lower()
-     ct   = getattr(uploaded_file, "content_type", "") or mimetypes.guess_type(name)[0] or ""
-     if not (name.endswith((".png", ".jpg", ".jpeg")) or (ct and ct.startswith("image/"))):
-          return None
-     # (선택) 용량 제한이 필요하면 여기서 체크
-     # if getattr(uploaded_file, "size", 0) > 6 * 1024 * 1024:
-     #     return None
-     raw = uploaded_file.read()
-     uploaded_file.seek(0)
-     b64 = base64.b64encode(raw).decode("utf-8")
-     mime = ct or ("image/png" if name.endswith(".png") else "image/jpeg")
-     return f"data:{mime};base64,{b64}"
+     return _normalize_plan_minimal(data), usage_info
 
 
 
@@ -176,73 +166,78 @@ def build_step_feedback(
      step_no: int,
      step_title: str,
      note: str = "",
-     image_data_urls: list[str] | None = None,
+     image_parts: list | None = None,     # inline_data parts
      file_names: list[str] | None = None,
      extra_texts: list[str] | None = None,
-     ) -> tuple[str, dict]:
-     """
-     return: (feedback_text, usage_info)
-     usage_info = {"prompt_tokens": int, "completion_tokens": int, "total_tokens": int}
-     """
-     image_data_urls = image_data_urls or []
-     file_names      = file_names or []
-     extra_texts     = extra_texts or []
+) -> tuple[str, dict]:
+     image_parts = image_parts or []
+     file_names  = file_names or []
+     extra_texts = extra_texts or []
 
-     # ✅ 톤앤매너 지침 반영
+     # 프롬프트 내용은 동일
      system = "너는 청년 사용자가 만든 콘텐츠에 대해 피드백을 주는 AI 코치다. JSON이 아니라 순수 텍스트만 출력해라."
 
      user_prompt = f"""
-     [목표]
-     {goal}
+[목표]
+{goal}
 
-     [단계]
-     {step_no}단계: {step_title}
+[단계]
+{step_no}단계: {step_title}
 
-     [메모]
-     {note or "없음"}
+[메모]
+{note or "없음"}
 
-     [톤앤매너 지침]
-     - 항상 잘한 점을 먼저 말한다.
-     - 개선 아이디어는 1~2개만, 추상적이 아니라 바로 적용 가능한 **구체적 팁**으로 제시한다.
-     - 다음 단계는 단순 지시가 아니라, **다음 미션과 연결되는 사전 연습(1.5단계/2.5단계)**처럼 짧게 제시한다.
-     - 마무리 멘트는 짧고 긍정적으로, 성취감과 반복 참여 의욕을 주도록 한다.
+[톤앤매너 지침]
+- 항상 잘한 점을 먼저 말한다.
+- 개선 아이디어는 1~2개만, 추상적이 아니라 바로 적용 가능한 **구체적 팁**으로 제시한다.
+- 다음 단계는 단순 지시가 아니라, **다음 미션과 연결되는 사전 연습(1.5단계/2.5단계)**처럼 짧게 제시한다.
+- 마무리 멘트는 짧고 긍정적으로, 성취감과 반복 참여 의욕을 주도록 한다.
 
-     [출력 구조]
-     잘한 점: [칭찬, 1~2문장]
+[출력 구조]
+잘한 점: [칭찬, 1~2문장]
 
-     개선 아이디어:
-     - [구체적 보완 팁1]
-     - [구체적 보완 팁2] (선택적)
+개선 아이디어:
+- [구체적 보완 팁1]
+- [구체적 보완 팁2] (선택적)
 
-     다음 단계: [다음 미션과 연결되는 1.5단계/2.5단계 액션 제안, 한 문장]
+다음 단계: [다음 미션과 연결되는 1.5단계/2.5단계 액션 제안, 한 문장]
 
-     마무리 멘트: [짧고 긍정적인 동기부여 멘트]
-     """.strip()
+마무리 멘트: [짧고 긍정적인 동기부여 멘트]
+""".strip()
 
-     content = [{"type": "text", "text": user_prompt}]
-
+     # 하위호환: system을 parts 맨 앞에 삽입
+     parts = [{"text": system}, {"text": user_prompt}]
      if file_names:
-          content.append({"type": "text", "text": "[파일명]\n" + ", ".join(file_names)})
-     for url in image_data_urls:
-          content.append({"type": "image_url", "image_url": {"url": url}})
+          parts.append({"text": "[파일명]\n" + ", ".join(file_names)})
+     parts.extend(image_parts)
      for t in extra_texts:
           snippet = (t[:1000] + "…") if len(t) > 1000 else t
-          content.append({"type": "text", "text": f"[텍스트 발췌]\n{snippet}"})
+          parts.append({"text": f"[텍스트 발췌]\n{snippet}"})
 
-     resp = client.chat.completions.create(
-          model="gpt-4o-mini",
-          messages=[
-               {"role": "system", "content": system},
-               {"role": "user", "content": content},
-          ],
-          temperature=0.4,  # 살짝 다양성 줘도 자연스러운 표현 가능
-          max_tokens=320,
+     res = client.models.generate_content(
+          model=MODEL,
+          contents=[{"role": "user", "parts": parts}],
+          # ✅ 구버전 호환: config 사용
+          config={"temperature": 0.4, "max_output_tokens": 320},
      )
 
-     feedback_text = resp.choices[0].message.content.strip()
+     # SDK 버전별 안전 추출
+     feedback_text = (getattr(res, "text", None) or getattr(res, "output_text", None) or "").strip()
+     if not feedback_text:
+          try:
+               p = getattr(res.candidates[0].content, "parts", [])
+               texts = [x.text for x in p if getattr(x, "text", None)]
+               feedback_text = "\n".join(texts).strip()
+          except Exception:
+               feedback_text = ""
+
+     um = getattr(res, "usage_metadata", None) or {}
      usage_info = {
-          "prompt_tokens": getattr(resp.usage, "prompt_tokens", None),
-          "completion_tokens": getattr(resp.usage, "completion_tokens", None),
-          "total_tokens": getattr(resp.usage, "total_tokens", None),
-     }
+          "prompt_tokens": getattr(um, "prompt_token_count", None),
+          "completion_tokens": getattr(um, "candidates_token_count", None)
+                                   or getattr(um, "output_token_count", None),
+          "total_tokens": getattr(um, "total_token_count", None),
+          }
      return feedback_text, usage_info
+
+
