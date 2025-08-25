@@ -194,21 +194,18 @@ def build_step_feedback(
 - 마무리 멘트는 짧고 긍정적으로, 성취감과 반복 참여 의욕을 주도록 한다.
 
 [출력 구조]
-잘한 점: [칭찬, 1~2문장]
-
-개선 아이디어:
+[칭찬, 1~2문장]
+     
 - [구체적 보완 팁1]
 - [구체적 보완 팁2] (선택적)
 
-다음 단계: [다음 미션과 연결되는 1.5단계/2.5단계 액션 제안, 한 문장]
+[다음 미션과 연결되는 1.5단계/2.5단계 액션 제안, 한 문장]
 
-마무리 멘트: [짧고 긍정적인 동기부여 멘트]
+[짧고 긍정적인 동기부여 멘트]
 """.strip()
 
      # 하위호환: system을 parts 맨 앞에 삽입
      parts = [{"text": system}, {"text": user_prompt}]
-     if file_names:
-          parts.append({"text": "[파일명]\n" + ", ".join(file_names)})
      parts.extend(image_parts)
      for t in extra_texts:
           snippet = (t[:1000] + "…") if len(t) > 1000 else t
