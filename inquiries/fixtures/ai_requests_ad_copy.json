@@ -9,7 +9,7 @@
             "url": "https://example.com/ai/ad_copy/001",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "싱그러운 점심 한입",
+            "title": "바질파스타 홍보",
             "content": "메인 카피: ‘한 접시의 초록 휴식’ / 설명: 바질 향 가득한 파스타를 점심 특선으로 강조하는 카피 제작 요청.",
             "saved_count": 0,
             "created_at": "2025-08-24T15:00:00+09:00",
@@ -26,7 +26,7 @@
             "url": "https://example.com/ai/ad_copy/002",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "오늘 밤은 수제맥주",
+            "title": "부드러운 수제맥주",
             "content": "메인 카피: ‘한 모금에 취하는 여름밤’ / 설명: 야외 맥주 이벤트 홍보용 SNS 문구 요청.",
             "saved_count": 0,
             "created_at": "2025-08-24T15:00:00+09:00",
@@ -43,7 +43,7 @@
             "url": "https://example.com/ai/ad_copy/003",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "달콤쌉싸름한 순간",
+            "title": "티라미수 홍보",
             "content": "메인 카피: ‘오늘 하루, 부드럽게 녹여드립니다’ / 설명: 티라미수 디저트의 감각적인 광고문구 요청.",
             "saved_count": 0,
             "created_at": "2025-08-24T15:00:00+09:00",
@@ -60,11 +60,11 @@
             "url": "https://example.com/ai/ad_copy/004",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "빵 속에 꽉 찬 즐거움",
+            "title": "맛있는 핫도그 홍보",
             "content": "메인 카피: ‘한입에 행복을 꽉 채우다’ / 설명: 학생 타깃 SNS 광고용 짧은 카피 제작.",
             "saved_count": 0,
-            "created_at": "2025-08-24T15:00:00+09:00",
-            "updated_at": "2025-08-24T15:00:00+09:00"
+            "created_at": "2025-08-24T18:00:00+09:00",
+            "updated_at": "2025-08-24T18:00:00+09:00"
         }
     },
     {
@@ -77,7 +77,7 @@
             "url": "https://example.com/ai/ad_copy/005",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "따끈달콤 갓 구운 맛",
+            "title": "따끈한 와플 홍보",
             "content": "메인 카피: ‘한 조각의 달콤한 사치’ / 설명: 와플 신메뉴 출시 포스터 문구 요청.",
             "saved_count": 0,
             "created_at": "2025-08-24T15:00:00+09:00",
@@ -94,7 +94,7 @@
             "url": "https://example.com/ai/ad_copy/006",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "국물 한 모금의 힘",
+            "title": "따뜻한 국수 홍보",
             "content": "메인 카피: ‘속을 데워주는 한 그릇’ / 설명: 겨울 시즌 오프라인 배너용 카피 제작.",
             "saved_count": 0,
             "created_at": "2025-08-24T15:00:00+09:00",
@@ -111,11 +111,11 @@
             "url": "https://example.com/ai/ad_copy/007",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "한 입의 이탈리아",
+            "title": "수제 젤라또 소개",
             "content": "메인 카피: ‘여행 같은 달콤함’ / 설명: 여름맞이 아이스크림 홍보 인스타그램용 문구 요청.",
             "saved_count": 0,
-            "created_at": "2025-08-24T15:00:00+09:00",
-            "updated_at": "2025-08-24T15:00:00+09:00"
+            "created_at": "2025-08-24T18:00:00+09:00",
+            "updated_at": "2025-08-24T18:00:00+09:00"
         }
     },
     {
@@ -128,7 +128,7 @@
             "url": "https://example.com/ai/ad_copy/008",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "다섯 가지 빛깔의 맛",
+            "title": "건강한 비빔밥 홍보",
             "content": "메인 카피: ‘한 그릇에 담은 건강’ / 설명: 외국인 관광객 타깃 전단용 카피 제작.",
             "saved_count": 0,
             "created_at": "2025-08-24T15:00:00+09:00",
@@ -145,11 +145,11 @@
             "url": "https://example.com/ai/ad_copy/009",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "신선함의 순간 포착",
+            "title": "신선한 스시 홍보",
             "content": "메인 카피: ‘바다에서 바로 온 그 맛’ / 설명: 신규 스시 코스 런칭 홍보용 카피.",
             "saved_count": 0,
-            "created_at": "2025-08-24T15:00:00+09:00",
-            "updated_at": "2025-08-24T15:00:00+09:00"
+            "created_at": "2025-08-24T18:00:00+09:00",
+            "updated_at": "2025-08-24T18:00:00+09:00"
         }
     },
     {
@@ -162,11 +162,11 @@
             "url": "https://example.com/ai/ad_copy/010",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "숯불 향이 살아있는",
+            "title": "숯불 향 갈비 소개",
             "content": "메인 카피: ‘불 위에 올린 정성’ / 설명: 포스터·현수막용 짧은 광고 카피 요청.",
             "saved_count": 0,
-            "created_at": "2025-08-24T15:00:00+09:00",
-            "updated_at": "2025-08-24T15:00:00+09:00"
+            "created_at": "2025-08-24T18:00:00+09:00",
+            "updated_at": "2025-08-24T18:00:00+09:00"
         }
     },
     {
@@ -179,11 +179,11 @@
             "url": "https://example.com/ai/ad_copy/011",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "가벼운 한 끼의 힘",
+            "title": "가벼운 한 끼 소개",
             "content": "메인 카피: ‘한 컵에 담은 신선함’ / 설명: 오피스 상권 점심 홍보 SNS용 문구.",
             "saved_count": 0,
-            "created_at": "2025-08-24T15:00:00+09:00",
-            "updated_at": "2025-08-24T15:00:00+09:00"
+            "created_at": "2025-08-24T18:00:00+09:00",
+            "updated_at": "2025-08-24T18:00:00+09:00"
         }
     },
     {
@@ -196,7 +196,7 @@
             "url": "https://example.com/ai/ad_copy/012",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "입안 가득 달콤한 행복",
+            "title": "달콤한 초콜릿 소개",
             "content": "메인 카피: ‘작은 조각이 주는 큰 위로’ / 설명: 밸런타인데이 프로모션 카피 제작.",
             "saved_count": 0,
             "created_at": "2025-08-24T15:00:00+09:00",
@@ -213,7 +213,7 @@
             "url": "https://example.com/ai/ad_copy/013",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "맥주+아이스크림 콜라보",
+            "title": "맥주+아이스크림 콜라보 홍보",
             "content": "메인 카피: ‘차갑게, 달콤하게, 짜릿하게’ / 설명: 여름 한정 메뉴 홍보 카피 제작.",
             "saved_count": 0,
             "created_at": "2025-08-24T15:00:00+09:00",
@@ -230,7 +230,7 @@
             "url": "https://example.com/ai/ad_copy/014",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "겉은 바삭, 속은 촉촉",
+            "title": "겉바속촉 크로플 홍보",
             "content": "메인 카피: ‘한 입의 기적’ / 설명: 신메뉴 크로플 런칭 SNS 광고문구.",
             "saved_count": 0,
             "created_at": "2025-08-24T15:00:00+09:00",
@@ -247,7 +247,7 @@
             "url": "https://example.com/ai/ad_copy/015",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "정직한 한 그릇",
+            "title": "국수 한그릇 소개",
             "content": "메인 카피: ‘국물부터 다른 진심’ / 설명: 전단·포스터용 핵심 카피 제작.",
             "saved_count": 0,
             "created_at": "2025-08-24T15:00:00+09:00",
@@ -264,11 +264,11 @@
             "url": "https://example.com/ai/ad_copy/016",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "작은 조각, 큰 기쁨",
+            "title": "달달한 마카롱 홍보",
             "content": "메인 카피: ‘하루를 달콤하게 채워줄 컬러’ / 설명: 시즌 한정 마카롱 패키지 홍보 카피.",
             "saved_count": 0,
-            "created_at": "2025-08-24T15:00:00+09:00",
-            "updated_at": "2025-08-24T15:00:00+09:00"
+            "created_at": "2025-08-24T18:00:00+09:00",
+            "updated_at": "2025-08-24T18:00:00+09:00"
         }
     },
     {
@@ -281,7 +281,7 @@
             "url": "https://example.com/ai/ad_copy/017",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "아침부터 여유롭게",
+            "title": "브런치 소개글",
             "content": "메인 카피: ‘한 끼로 완성하는 힐링’ / 설명: 브런치 세트 런칭 카피 제작.",
             "saved_count": 0,
             "created_at": "2025-08-24T15:00:00+09:00",
@@ -298,7 +298,7 @@
             "url": "https://example.com/ai/ad_copy/018",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "하루를 달콤하게 시작",
+            "title": "파운드케이크 홍보",
             "content": "메인 카피: ‘부드럽게 녹아드는 아침’ / 설명: 신제품 파운드케이크 런칭 홍보문구.",
             "saved_count": 0,
             "created_at": "2025-08-24T15:00:00+09:00",
@@ -315,7 +315,7 @@
             "url": "https://example.com/ai/ad_copy/019",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "전통과 현대의 달콤한 만남",
+            "title": "새로운 떡카페 소개",
             "content": "메인 카피: ‘한 입에 한국의 멋’ / 설명: 젊은층 타깃 SNS 홍보 카피 제작.",
             "saved_count": 0,
             "created_at": "2025-08-24T15:00:00+09:00",
@@ -332,7 +332,7 @@
             "url": "https://example.com/ai/ad_copy/020",
             "status": "OPEN",
             "category": "AD_COPY",
-            "title": "여름을 담은 달콤함",
+            "title": "새콤달콤 파인애플바 소개",
             "content": "메인 카피: ‘한 입의 트로피컬 파워’ / 설명: 시즌 음료 광고 문구 제작.",
             "saved_count": 0,
             "created_at": "2025-08-24T15:00:00+09:00",
