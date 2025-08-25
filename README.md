@@ -1,7 +1,7 @@
 # 2025-hackathon-3-LOFO-backend
 
 <p align="center">
-  <a href="https://github.com/your-org/your-repo">
+  <a href="https://github.com/LikeLion-at-DGU/2025-hackathon-3-LOFO-backend">
     <img src="./assets/logo/lofo-logo.png" alt="LOFO Logo" width="200">
   </a>
 </p>
@@ -14,7 +14,9 @@
 
 ## 📌 About LOFO
 
-![LOFO 포스터 1](./assets/posters/lofo-poster-1.png) | ![LOFO 포스터 2](./assets/posters/lofo-poster-2.g)
+|                                                      |                                                      |
+| ---------------------------------------------------- | ---------------------------------------------------- |
+| ![LOFO 포스터 1](./assets/posters/lofo-poster-1.png) | ![LOFO 포스터 2](./assets/posters/lofo-poster-2.png) |
 
 노포는 **홍보 역량 부족**으로, 청년은 **기회 부족**으로 어려움을 겪고 있습니다.  
 **LOFO**는 두 문제를 연결해, **AI 기반 미션과 피드백**을 통해
