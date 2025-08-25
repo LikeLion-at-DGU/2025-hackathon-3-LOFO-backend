@@ -185,6 +185,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5174",
     "http://127.0.0.1:5174",
     "https://2025-hackathon-3-lofo.netlify.app",
+    "https://lofo.life",
+    "https://www.lofo.life"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -203,7 +205,7 @@ load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # 보안/쿠키
-SESSION_COOKIE_SECURE = True                 # HTTPS 필수
-SESSION_COOKIE_SAMESITE = "None"             # 교차 도메인 세션 허용
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "None"
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = "None"

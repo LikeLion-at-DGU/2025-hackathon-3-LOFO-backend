@@ -56,6 +56,7 @@ def _handle_login(request, role):
         home_url = "/youth/home" if role == Profile.Role.YOUTH else "/nopo/home"
         return Response({"message": "신규 회원 가입 및 로그인 성공", "redirect": home_url}, status=status.HTTP_201_CREATED)
 
+
 @api_view(["POST"])
 @permission_classes([AllowAny])  
 def login_youth(request):
