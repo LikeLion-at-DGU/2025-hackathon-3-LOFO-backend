@@ -15,9 +15,9 @@
 ## 📌 About LOFO
 
 <p align="center">
-  <img src="assets/posters/lofo-poster-1.png" alt="LOFO Poster 1" height="320">
+  <img src="assets/posters/lofo-poster-1.png" alt="LOFO Poster 1" height="400">
   &nbsp;&nbsp;
-  <img src="assets/posters/lofo-poster-2.png" alt="LOFO Poster 2" height="320">
+  <img src="assets/posters/lofo-poster-2.png" alt="LOFO Poster 2" height="400">
 </p>
 
 노포는 **홍보 역량 부족**으로, 청년은 **기회 부족**으로 어려움을 겪고 있습니다.  
