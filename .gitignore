@@ -226,5 +226,3 @@ db.sqlite3-journal
 !media/requests/
 !media/requests/ai/
 !media/requests/ai/**
-
-!assets
