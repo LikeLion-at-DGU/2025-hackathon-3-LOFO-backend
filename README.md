@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://github.com/LikeLion-at-DGU/2025-hackathon-3-LOFO-backend">
-    <img src="./assets/logo/lofo-logo.png" alt="LOFO Logo" width="200">
+    <img src="assets/logo/lofo-logo.png" alt="LOFO Logo" width="200">
   </a>
 </p>
 
@@ -14,9 +14,11 @@
 
 ## 📌 About LOFO
 
-|                                                      |                                                      |
-| ---------------------------------------------------- | ---------------------------------------------------- |
-| ![LOFO 포스터 1](./assets/posters/lofo-poster-1.png) | ![LOFO 포스터 2](./assets/posters/lofo-poster-2.png) |
+<p align="center">
+  <img src="assets/posters/lofo-poster-1.png" alt="LOFO Poster 1" height="320">
+  &nbsp;&nbsp;
+  <img src="assets/posters/lofo-poster-2.png" alt="LOFO Poster 2" height="320">
+</p>
 
 노포는 **홍보 역량 부족**으로, 청년은 **기회 부족**으로 어려움을 겪고 있습니다.  
 **LOFO**는 두 문제를 연결해, **AI 기반 미션과 피드백**을 통해
@@ -28,13 +30,13 @@
 
 ## 👥 Team Members
 
-| Avatar                                                                               | Name       | Role     | GitHub                                         | Email                |
-| ------------------------------------------------------------------------------------ | ---------- | -------- | ---------------------------------------------- | -------------------- |
-| [![박진희](https://github.com/<gh-park>.png?size=100)](https://github.com/<gh-park>) | **박진희** | PD       | [@wlsgml120](https://github.com/wlsgml120)     | 2022111017@dgu.ac.kr |
-| [![이보연](https://github.com/<gh-leeb>.png?size=100)](https://github.com/<gh-leeb>) | **이보연** | Frontend | [@leeboyeon17](https://github.com/leeboyeon17) | 2023110695@dgu.ac.kr |
-| [![김홍연](https://github.com/<gh-kimh>.png?size=100)](https://github.com/<gh-kimh>) | **김홍연** | Frontend | [@HongYounKim](https://github.com/HongYounKim) | lunakby@dgu.ac.kr    |
-| [![권수현](https://github.com/<gh-kwon>.png?size=100)](https://github.com/<gh-kwon>) | **권수현** | Backend  | [@lo2q](https://github.com/lo2q)               | 1029tngus@dgu.ac.kr  |
-| [![구은지](https://github.com/<gh-goo>.png?size=100)](https://github.com/<gh-goo>)   | **구은지** | Backend  | [@eunji9](https://github.com/eunji9)           | silverji9@dgu.ac.kr  |
+| Avatar                                                                                   | Name       | Role     | GitHub                                         | Email                |
+| ---------------------------------------------------------------------------------------- | ---------- | -------- | ---------------------------------------------- | -------------------- |
+| [![박진희](https://github.com/wlsgml120.png?size=100)](https://github.com/wlsgml120)     | **박진희** | PD       | [@wlsgml120](https://github.com/wlsgml120)     | 2022111017@dgu.ac.kr |
+| [![이보연](https://github.com/leeboyeon17.png?size=100)](https://github.com/leeboyeon17) | **이보연** | Frontend | [@leeboyeon17](https://github.com/leeboyeon17) | 2023110695@dgu.ac.kr |
+| [![김홍연](https://github.com/HongYounKim.png?size=100)](https://github.com/HongYounKim) | **김홍연** | Frontend | [@HongYounKim](https://github.com/HongYounKim) | lunakby@dgu.ac.kr    |
+| [![권수현]((https://github.com/lo2q.png?size=100)](https://github.com/lo2q)              | **권수현** | Backend  | [@lo2q](https://github.com/lo2q)               | 1029tngus@dgu.ac.kr  |
+| [![구은지](https://github.com/eunji9.png?size=100)](https://github.com/eunji9)           | **구은지** | Backend  | [@eunji9](https://github.com/eunji9)           | silverji9@dgu.ac.kr  |
 
 ---
 
