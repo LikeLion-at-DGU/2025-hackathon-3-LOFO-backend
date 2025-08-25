@@ -30,13 +30,13 @@
 
 ## 👥 Team Members
 
-| Avatar                                                                                   | Name       | Role     | GitHub                                         | Email                |
-| ---------------------------------------------------------------------------------------- | ---------- | -------- | ---------------------------------------------- | -------------------- |
-| [![박진희](https://github.com/wlsgml120.png?size=100)](https://github.com/wlsgml120)     | **박진희** | PD       | [@wlsgml120](https://github.com/wlsgml120)     | 2022111017@dgu.ac.kr |
-| [![이보연](https://github.com/leeboyeon17.png?size=100)](https://github.com/leeboyeon17) | **이보연** | Frontend | [@leeboyeon17](https://github.com/leeboyeon17) | 2023110695@dgu.ac.kr |
-| [![김홍연](https://github.com/HongYounKim.png?size=100)](https://github.com/HongYounKim) | **김홍연** | Frontend | [@HongYounKim](https://github.com/HongYounKim) | lunakby@dgu.ac.kr    |
-| [![권수현]((https://github.com/lo2q.png?size=100)](https://github.com/lo2q)              | **권수현** | Backend  | [@lo2q](https://github.com/lo2q)               | 1029tngus@dgu.ac.kr  |
-| [![구은지](https://github.com/eunji9.png?size=100)](https://github.com/eunji9)           | **구은지** | Backend  | [@eunji9](https://github.com/eunji9)           | silverji9@dgu.ac.kr  |
+| Avatar                                                                                  | Name       | Role                                                                                                                                   | GitHub                                         | Email                |
+| --------------------------------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | -------------------- |
+| [![박진희](https://github.com/wlsgml120.png?size=20)](https://github.com/wlsgml120)     | **박진희** | <img src="https://img.shields.io/badge/PD-7C3AED?style=flat-square&labelColor=1f2937&logoColor=white" alt="PD">                        | [@wlsgml120](https://github.com/wlsgml120)     | 2022111017@dgu.ac.kr |
+| [![이보연](https://github.com/leeboyeon17.png?size=20)](https://github.com/leeboyeon17) | **이보연** | <img src="https://img.shields.io/badge/Frontend-0EA5E9?style=flat-square&labelColor=1f2937&logo=react&logoColor=white" alt="Frontend"> | [@leeboyeon17](https://github.com/leeboyeon17) | 2023110695@dgu.ac.kr |
+| [![김홍연](https://github.com/HongYounKim.png?size=20)](https://github.com/HongYounKim) | **김홍연** | <img src="https://img.shields.io/badge/Frontend-0EA5E9?style=flat-square&labelColor=1f2937&logo=react&logoColor=white" alt="Frontend"> | [@HongYounKim](https://github.com/HongYounKim) | lunakby@dgu.ac.kr    |
+| [![권수현]((https://github.com/lo2q.png?size=20)](https://github.com/lo2q)              | **권수현** | <img src="https://img.shields.io/badge/Backend-10B981?style=flat-square&labelColor=1f2937&logo=spring&logoColor=white" alt="Backend">  | [@lo2q](https://github.com/lo2q)               | 1029tngus@dgu.ac.kr  |
+| [![구은지](https://github.com/eunji9.png?size=20)](https://github.com/eunji9)           | **구은지** | <img src="https://img.shields.io/badge/Backend-10B981?style=flat-square&labelColor=1f2937&logo=spring&logoColor=white" alt="Backend">  | [@eunji9](https://github.com/eunji9)           | silverji9@dgu.ac.kr  |
 
 ---
 
