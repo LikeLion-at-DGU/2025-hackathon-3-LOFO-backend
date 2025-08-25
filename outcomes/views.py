@@ -266,7 +266,7 @@ def youth_saved(request):
             "saved_count": r.saved_count,
             "created_at": r.created_at,
             "toggle_url": request.build_absolute_uri(   
-                reverse("request-save-mission", args=[r.id])
+                reverse("save-mission")
             ),
         })
 
