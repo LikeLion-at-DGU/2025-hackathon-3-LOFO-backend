@@ -42,7 +42,7 @@ def youth_portfolio(request):
 
     qs = (
         Outcome.objects
-        .filter(owner=request.user.profile)
+        .filter(youth=profile)
         .select_related("mission__request")
         .prefetch_related(Prefetch("files", queryset=cover_qs))
         .only(
