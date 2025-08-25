@@ -451,7 +451,6 @@ def mission_feedback(request):
                step_title=step.title or f"{step_no}단계",
                note=note,
                image_parts=image_parts,
-               file_names=file_names,
                extra_texts=text_snippets,
           )
      except Exception as e:
@@ -467,6 +466,7 @@ def mission_feedback(request):
           "feedback": feedback_text,
           "feedback_count": step.feedback_count,
           "usage": usage,
+          "files_uploaded": file_names,
      }, status=status.HTTP_200_OK)
 
 

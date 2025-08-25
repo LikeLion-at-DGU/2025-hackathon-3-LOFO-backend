@@ -206,8 +206,6 @@ def build_step_feedback(
 
      # 하위호환: system을 parts 맨 앞에 삽입
      parts = [{"text": system}, {"text": user_prompt}]
-     if file_names:
-          parts.append({"text": "[파일명]\n" + ", ".join(file_names)})
      parts.extend(image_parts)
      for t in extra_texts:
           snippet = (t[:1000] + "…") if len(t) > 1000 else t
