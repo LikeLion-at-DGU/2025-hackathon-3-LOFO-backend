@@ -164,7 +164,6 @@ def nopo_request(request):
 
 
 # 요청입력
-@csrf_exempt
 @api_view(["POST"])
 @parser_classes([MultiPartParser, FormParser, JSONParser])
 def nopo_request_create(request):
