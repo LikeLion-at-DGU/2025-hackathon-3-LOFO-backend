@@ -193,6 +193,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5174",
     "http://127.0.0.1:5174",
     "https://2025-hackathon-3-lofo.netlify.app",
+    "https://lofo.life",
+    "https://www.lofo.life"
 ]
 
 from dotenv import load_dotenv
