@@ -1,0 +1,342 @@
+[
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 브런치카페",
+        "image": "requests/ai/interior_proposal/interior_proposal_001.jpg",
+        "url": "https://example.com/ai/interior_proposal/001",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "화이트톤 브런치 인테리어",
+        "content": "화이트&우드 톤의 따뜻한 분위기의 인테리어를 만들고 싶어요. 자연광을 살리고 식물 장식을 더해 북유럽 감성이면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T21:00:00+09:00",
+        "updated_at": "2025-08-24T21:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 수제버거",
+        "image": "requests/ai/interior_proposal/interior_proposal_002.jpg",
+        "url": "https://example.com/ai/interior_proposal/002",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "인더스트리얼 버거샵",
+        "content": "벽돌과 철제를 강조한 인더스트리얼 무드로 가고 싶어요. 오픈 주방이 보이는 활기찬 동선이면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T18:00:00+09:00",
+        "updated_at": "2025-08-24T18:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 와인바",
+        "image": "requests/ai/interior_proposal/interior_proposal_003.jpg",
+        "url": "https://example.com/ai/interior_proposal/003",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "빈티지 와인바 무드",
+        "content": "어두운 조명과 벨벳 소파로 프라이빗한 와인바 분위기를 만들고 싶어요. 빈티지 포스터로 포인트를 주면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 디저트샵",
+        "image": "requests/ai/interior_proposal/interior_proposal_004.jpg",
+        "url": "https://example.com/ai/interior_proposal/004",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "핑크&골드 디저트샵",
+        "content": "파스텔 핑크와 골드 포인트로 인스타 감성의 디저트샵을 만들고 싶어요. 전면 유리 진열로 제품이 잘 보이면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 라멘야",
+        "image": "requests/ai/interior_proposal/interior_proposal_005.jpg",
+        "url": "https://example.com/ai/interior_proposal/005",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "일본 전통 라멘집",
+        "content": "목재 바 테이블과 등롱 조명으로 아늑한 라멘집 분위기를 만들고 싶어요. 오픈 주방 앞 카운터석이 있으면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T21:00:00+09:00",
+        "updated_at": "2025-08-24T21:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 중식당",
+        "image": "requests/ai/interior_proposal/interior_proposal_006.jpg",
+        "url": "https://example.com/ai/interior_proposal/006",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "모던 차이니즈 레스토랑",
+        "content": "레드 포인트와 심플한 라인으로 모던 차이니즈 무드를 만들고 싶어요. 둥근 테이블 위주의 단체석 배치면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 치킨포차",
+        "image": "requests/ai/interior_proposal/interior_proposal_007.jpg",
+        "url": "https://example.com/ai/interior_proposal/007",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "스트릿 포차 무드",
+        "content": "형광 간판과 포스터 월로 스트릿 포차 감성을 만들고 싶어요. 붉은 조명으로 젊고 자유로운 무드면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T18:00:00+09:00",
+        "updated_at": "2025-08-24T18:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 스테이크하우스",
+        "image": "requests/ai/interior_proposal/interior_proposal_008.jpg",
+        "url": "https://example.com/ai/interior_proposal/008",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "클래식 스테이크하우스",
+        "content": "짙은 원목과 가죽 소파로 중후한 스테이크하우스 분위기를 만들고 싶어요. 와인 저장고 디스플레이가 있으면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 카레하우스",
+        "image": "requests/ai/interior_proposal/interior_proposal_009.jpg",
+        "url": "https://example.com/ai/interior_proposal/009",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "에스닉 카레 전문점",
+        "content": "에스닉 패턴과 오렌지 톤 벽지로 따뜻한 카레하우스 느낌을 만들고 싶어요. 향신료 선반을 전면에 두면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 스무디랩",
+        "image": "requests/ai/interior_proposal/interior_proposal_010.jpg",
+        "url": "https://example.com/ai/interior_proposal/010",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "헬시 무드 스무디샵",
+        "content": "화이트 타일에 그린 포인트로 건강한 무드를 만들고 싶어요. 식물 행잉과 디지털 메뉴보드면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T18:00:00+09:00",
+        "updated_at": "2025-08-24T18:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 타코바",
+        "image": "requests/ai/interior_proposal/interior_proposal_011.jpg",
+        "url": "https://example.com/ai/interior_proposal/011",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "멕시칸 스트릿 무드",
+        "content": "형형색색의 벽화와 네온으로 라틴 스트릿 무드를 만들고 싶어요. 바 테이블과 원색 포인트 컬러면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 해산물포차",
+        "image": "requests/ai/interior_proposal/interior_proposal_012.jpg",
+        "url": "https://example.com/ai/interior_proposal/012",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "마린 무드 해산물포차",
+        "content": "블루&화이트 톤과 항구 오브제로 마린 무드를 만들고 싶어요. 그물·조개 장식이 포인트면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 카페도서관",
+        "image": "requests/ai/interior_proposal/interior_proposal_013.jpg",
+        "url": "https://example.com/ai/interior_proposal/013",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "북카페 무드",
+        "content": "벽면 책장과 조용한 독서존이 있는 북카페를 만들고 싶어요. 은은한 스탠드 조명이면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 아이스크림랩",
+        "image": "requests/ai/interior_proposal/interior_proposal_014.jpg",
+        "url": "https://example.com/ai/interior_proposal/014",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "팝아트 아이스크림샵",
+        "content": "네온사인과 팝아트 그래픽으로 톡톡 튀는 매장을 만들고 싶어요. 포토존 조형물이 있으면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T18:00:00+09:00",
+        "updated_at": "2025-08-24T18:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 펍앤그릴",
+        "image": "requests/ai/interior_proposal/interior_proposal_015.jpg",
+        "url": "https://example.com/ai/interior_proposal/015",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "어반 펍 스타일",
+        "content": "벽돌 벽과 LED 조명으로 캐주얼한 펍 분위기를 만들고 싶어요. 스포츠 중계 스크린과 탭룸 바가 있으면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 베이글하우스",
+        "image": "requests/ai/interior_proposal/interior_proposal_016.jpg",
+        "url": "https://example.com/ai/interior_proposal/016",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "뉴욕 델리 무드",
+        "content": "대리석 카운터와 뉴욕 간판 모티브로 델리 무드를 만들고 싶어요. 전면 베이글 진열이 강조되면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 파스타하우스",
+        "image": "requests/ai/interior_proposal/interior_proposal_017.jpg",
+        "url": "https://example.com/ai/interior_proposal/017",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "로맨틱 파스타 레스토랑",
+        "content": "캔들 조명과 와인랙으로 로맨틱한 파스타 집을 만들고 싶어요. 창가 커플석 위주 배치면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 카페드로잉",
+        "image": "requests/ai/interior_proposal/interior_proposal_018.jpg",
+        "url": "https://example.com/ai/interior_proposal/018",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "아트 갤러리 카페",
+        "content": "화이트 갤러리 벽에 작품을 걸 수 있는 카페를 만들고 싶어요. 손님이 드로잉 체험을 할 수 있으면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 감자탕집",
+        "image": "requests/ai/interior_proposal/interior_proposal_019.jpg",
+        "url": "https://example.com/ai/interior_proposal/019",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "푸근한 한식 무드",
+        "content": "원목 테이블과 전통 문양으로 푸근한 한식 무드를 만들고 싶어요. 노란 톤 조명으로 따뜻하면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    },
+    {
+        "model": "inquiries.request",
+        "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 스무디바",
+        "image": "requests/ai/interior_proposal/interior_proposal_020.jpg",
+        "url": "https://example.com/ai/interior_proposal/020",
+        "status": "OPEN",
+        "category": "INTERIOR_PROPOSAL",
+        "title": "비비드 스무디바",
+        "content": "레드·옐로우·그린의 비비드 톤으로 에너제틱한 스무디바를 만들고 싶어요. 과일 그래픽과 대형 메뉴보드면 좋겠어요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+        }
+    }
+]

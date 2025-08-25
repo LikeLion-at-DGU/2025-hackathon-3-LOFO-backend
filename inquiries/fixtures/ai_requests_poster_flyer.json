@@ -1,0 +1,342 @@
+[
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 양곱창",
+        "image": "requests/ai/poster_flyer/poster_flyer_001.jpg",
+        "url": "https://example.com/ai/poster_flyer/001",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "전단 1장 제작",
+        "content": "A4 전단 1장 제작. 시그니처 곱창 메뉴 사진을 전면에 배치하고, 메뉴명과 가격은 아이콘과 함께 한눈에 보기 쉽게 구성해주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 미니분식",
+        "image": "requests/ai/poster_flyer/poster_flyer_002.jpg",
+        "url": "https://example.com/ai/poster_flyer/002",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "오픈 포스터",
+        "content": "신규 오픈 홍보용 포스터. 매장 전경 사진을 배경으로 사용하고, 오픈 날짜와 오픈 기념 이벤트를 눈에 띄는 색상으로 강조해주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 브런치카페",
+        "image": "requests/ai/poster_flyer/poster_flyer_003.jpg",
+        "url": "https://example.com/ai/poster_flyer/003",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "행사 포스터",
+        "content": "주말 브런치 이벤트 포스터. 따뜻한 색감으로 브런치 메뉴 사진을 크게 보여주고, 시간과 가격은 세로형 타이포그래피로 정리해주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T18:00:00+09:00",
+        "updated_at": "2025-08-24T18:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 수제버거",
+        "image": "requests/ai/poster_flyer/poster_flyer_004.jpg",
+        "url": "https://example.com/ai/poster_flyer/004",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "신메뉴 전단",
+        "content": "신규 버거 출시 전단. 단면 버거 사진을 큼직하게 두고, ‘100% 순쇠고기 패티’ 문구를 포인트 컬러로 강조해주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 피자랩",
+        "image": "requests/ai/poster_flyer/poster_flyer_005.jpg",
+        "url": "https://example.com/ai/poster_flyer/005",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "세일 포스터",
+        "content": "평일 한정 세일 안내. 치즈 늘어나는 피자 사진과 함께 ‘50% 할인’ 문구를 크게 배치하여 주목도를 높여주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 와인바",
+        "image": "requests/ai/poster_flyer/poster_flyer_006.jpg",
+        "url": "https://example.com/ai/poster_flyer/006",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "메뉴 전단",
+        "content": "와인바 주요 와인 리스트와 안주 메뉴 전단. 와인잔과 치즈보드 사진을 곁들여 고급스러운 분위기를 전달해주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T18:00:00+09:00",
+        "updated_at": "2025-08-24T18:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 스테이크하우스",
+        "image": "requests/ai/poster_flyer/poster_flyer_007.jpg",
+        "url": "https://example.com/ai/poster_flyer/007",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "쿠폰 전단",
+        "content": "스테이크 주문 시 와인 무료 제공 쿠폰 전단. 쿠폰 영역을 잘라 쓸 수 있도록 절취선 디자인을 넣어주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T18:00:00+09:00",
+        "updated_at": "2025-08-24T18:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 스시오마카세",
+        "image": "requests/ai/poster_flyer/poster_flyer_008.jpg",
+        "url": "https://example.com/ai/poster_flyer/008",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "이벤트 전단",
+        "content": "런치 이벤트 전단. 모던한 레이아웃과 넉넉한 여백을 사용하여 고급스러운 이미지를 주고, 할인율을 타이포로 강조해주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T18:00:00+09:00",
+        "updated_at": "2025-08-24T18:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 라멘야",
+        "image": "requests/ai/poster_flyer/poster_flyer_009.jpg",
+        "url": "https://example.com/ai/poster_flyer/009",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "런칭 포스터",
+        "content": "신규 런칭 포스터. 라멘 한 그릇 클로즈업 사진과 함께 ‘GRAND OPEN’ 헤드라인을 넣어 시선을 끌어주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T18:00:00+09:00",
+        "updated_at": "2025-08-24T18:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 치킨포차",
+        "image": "requests/ai/poster_flyer/poster_flyer_010.jpg",
+        "url": "https://example.com/ai/poster_flyer/010",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "A3 포스터",
+        "content": "야식 치킨 할인 프로모션 포스터. 치킨과 맥주 사진을 크게 보여주고, 밤 시간대 할인 조건을 아이콘으로 설명해주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T18:00:00+09:00",
+        "updated_at": "2025-08-24T18:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 디저트샵",
+        "image": "requests/ai/poster_flyer/poster_flyer_011.jpg",
+        "url": "https://example.com/ai/poster_flyer/011",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "A4 전단",
+        "content": "디저트 6종 홍보 전단. 달콤한 색감과 일러스트를 사용하고, 추천 세트메뉴 가격을 강조해주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 베이커리",
+        "image": "requests/ai/poster_flyer/poster_flyer_012.jpg",
+        "url": "https://example.com/ai/poster_flyer/012",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "가격표 전단",
+        "content": "대표 빵 8종 가격표 전단. 사진과 함께 아이콘을 활용하여 시각적으로 명확하게 전달해주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 핫도그스탠드",
+        "image": "requests/ai/poster_flyer/poster_flyer_013.jpg",
+        "url": "https://example.com/ai/poster_flyer/013",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "브랜딩 포스터",
+        "content": "핫도그 전문점 브랜딩 포스터. 브랜드 로고와 심볼을 중심으로, 레드&옐로우 톤으로 통일된 디자인을 요청합니다.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 비스트로소반",
+        "image": "requests/ai/poster_flyer/poster_flyer_014.jpg",
+        "url": "https://example.com/ai/poster_flyer/014",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "지역행사 전단",
+        "content": "동네 축제 연계 전단. 지역 주민이 공감할 수 있도록 지도 일러스트와 행사 일정을 친근하게 넣어주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 중식당",
+        "image": "requests/ai/poster_flyer/poster_flyer_015.jpg",
+        "url": "https://example.com/ai/poster_flyer/015",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "리크루팅 전단",
+        "content": "중식당 파트타이머 모집 전단. 근무 조건은 간략히 아이콘으로, 모집 문의는 QR 코드로 연결되게 해주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 한식당",
+        "image": "requests/ai/poster_flyer/poster_flyer_016.jpg",
+        "url": "https://example.com/ai/poster_flyer/016",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "배달전단 1장",
+        "content": "배달 메뉴 안내 전단. 배달앱 로고와 QR 코드 이미지를 배치하여 직관적인 안내가 되도록 구성해주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 타코바",
+        "image": "requests/ai/poster_flyer/poster_flyer_017.jpg",
+        "url": "https://example.com/ai/poster_flyer/017",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "리뉴얼 포스터",
+        "content": "리브랜딩 안내 포스터. 새로운 로고와 색상을 적용하고, Before/After 비교 이미지를 넣어 변화를 강조해주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 쌀국수집",
+        "image": "requests/ai/poster_flyer/poster_flyer_018.jpg",
+        "url": "https://example.com/ai/poster_flyer/018",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "타임세일 전단",
+        "content": "쌀국수 전문점 타임세일 전단. 시간대별 할인율을 인포그래픽 형태로 시각화하여 직관적으로 보여주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 커피로스터리",
+        "image": "requests/ai/poster_flyer/poster_flyer_019.jpg",
+        "url": "https://example.com/ai/poster_flyer/019",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "야간행사 포스터",
+        "content": "야간 디제잉 공연 홍보 포스터. DJ 턴테이블 사진과 네온사인 타이포를 활용해 클럽 분위기를 살려주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+      }
+    },
+    {
+      "model": "inquiries.request",
+      "fields": {
+        "owner": 1,
+        "is_ai": true,
+        "store_name": "AI 펍앤그릴",
+        "image": "requests/ai/poster_flyer/poster_flyer_020.jpg",
+        "url": "https://example.com/ai/poster_flyer/020",
+        "status": "OPEN",
+        "category": "POSTER_FLYER",
+        "title": "주말전단 한장",
+        "content": "주말 특가 세트 메뉴 홍보 전단. 햄버거·맥주·감자튀김 세트를 감각적인 아이콘과 함께 표현해주세요.",
+        "saved_count": 0,
+        "created_at": "2025-08-24T15:00:00+09:00",
+        "updated_at": "2025-08-24T15:00:00+09:00"
+      }
+    }
+]
